@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garage Moreau — Mécanique toutes marques à Nantes</title>
+<meta name="description" content="Garage toutes marques à Nantes : entretien, freins, pneus, climatisation, diagnostic. Prix affichés et rendez-vous en ligne.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#e10600;--red2:#ff2d20;--char:#15171b;--steel:#22262c;--metal:#2d323a;--fog:#f4f5f7;--muted:#8c939e;--ink:#15171b;--line:#e3e6ea}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Barlow,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,.cond{font-family:"Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;letter-spacing:.01em}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;background:var(--red);color:#fff;font-family:"Barlow Condensed";font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;border:0;cursor:pointer;clip-path:polygon(0 0,100% 0,94% 100%,0 100%);transition:background .2s}
+  .btn:hover{background:var(--red2)}
+  .btn.out{background:transparent;border:2px solid #fff;clip-path:none}
+  .top{background:var(--char);color:#c5cad2;font-size:14px}
+  .top .wrap{display:flex;justify-content:space-between;gap:12px;padding-top:8px;padding-bottom:8px;flex-wrap:wrap}
+  header{background:var(--steel);color:#fff;position:sticky;top:0;z-index:40;border-bottom:3px solid var(--red)}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .logo{font-family:"Barlow Condensed";font-weight:800;font-size:28px;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+  .logo svg{width:38px}
+  .logo span{color:var(--red)}
+  .menu{display:flex;gap:30px;font-family:"Barlow Condensed";font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:.06em}
+  .menu a:hover{color:var(--red2)}
+  .burger{display:none;background:none;border:0;color:#fff;font-size:28px;cursor:pointer}
+  .hero{background:linear-gradient(105deg,var(--char) 0%,var(--char) 52%,transparent 52.1%),linear-gradient(135deg,#3a4049,#1d2025);color:#fff;position:relative;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;min-height:600px;padding-top:48px;padding-bottom:48px}
+  .hero h1{font-size:clamp(46px,6.4vw,86px);line-height:.92;font-weight:800}
+  .hero h1 em{font-style:normal;color:var(--red)}
+  .hero p{color:#c5cad2;font-size:18px;max-width:480px;margin:22px 0 30px}
+  .hero .ctas{display:flex;gap:14px;flex-wrap:wrap}
+  .car{width:110%;max-width:640px;justify-self:end;filter:drop-shadow(0 30px 30px rgba(0,0,0,.5))}
+  .kpis{display:flex;gap:30px;margin-top:36px;flex-wrap:wrap}
+  .kpis b{display:block;font-family:"Barlow Condensed";font-size:38px;line-height:1;color:#fff}
+  .kpis span{color:var(--muted);font-size:14px}
+  section{padding:92px 0}
+  .kick{color:var(--red);font-family:"Barlow Condensed";font-weight:700;letter-spacing:.2em;font-size:16px;text-transform:uppercase}
+  h2{font-size:clamp(36px,4.6vw,58px);line-height:1;margin:8px 0 14px;font-weight:800}
+  .sub{color:#5d636d;max-width:560px}
+  .filters{display:flex;gap:8px;margin:32px 0 24px;flex-wrap:wrap}
+  .filters button{border:2px solid var(--char);background:#fff;padding:8px 18px;font-family:"Barlow Condensed";font-weight:700;font-size:17px;text-transform:uppercase;cursor:pointer}
+  .filters button.on{background:var(--char);color:#fff}
+  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .pr{border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s,transform .2s}
+  .pr:hover{border-color:var(--red);transform:translateY(-3px)}
+  .pr.hide{display:none}
+  .pr .cat{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+  .pr h3{font-size:24px;line-height:1.05}
+  .pr p{color:#5d636d;font-size:15px;flex:1}
+  .pr .amt{font-family:"Barlow Condensed";font-size:34px;font-weight:800;color:var(--red);line-height:1}
+  .pr .amt small{font-size:15px;color:var(--muted);font-weight:600}
+  .dark{background:var(--char);color:#fff}
+  .why{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:40px;background:var(--metal)}
+  .why div{background:var(--char);padding:30px}
+  .why b{font-family:"Barlow Condensed";font-size:22px;text-transform:uppercase;display:block;margin:14px 0 6px}
+  .why p{color:var(--muted);font-size:15px}
+  .why svg{width:34px;height:34px;color:var(--red)}
+  .slider{position:relative;max-width:820px;margin:40px auto 0;overflow:hidden}
+  .track{display:flex;transition:transform .5s ease}
+  .slide{min-width:100%;text-align:center;padding:0 40px}
+  .slide blockquote{font-size:clamp(20px,2.4vw,28px);font-weight:500;line-height:1.4}
+  .slide cite{display:block;margin-top:16px;font-style:normal;color:var(--red);font-family:"Barlow Condensed";font-size:18px;text-transform:uppercase;letter-spacing:.1em}
+  .dots{display:flex;justify-content:center;gap:10px;margin-top:26px}
+  .dots button{width:34px;height:4px;border:0;background:#c9ced6;cursor:pointer}
+  .dots button.on{background:var(--red)}
+  .rdv{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+  .rdv form{background:var(--fog);padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:14px;border-top:4px solid var(--red)}
+  .rdv label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+  .rdv .full{grid-column:span 2}
+  .rdv input,.rdv select{font:inherit;padding:12px 14px;border:1px solid #cfd4db;background:#fff}
+  .rdv input:focus,.rdv select:focus{outline:2px solid var(--red);border-color:transparent}
+  .plate{display:flex;align-items:stretch;border:2px solid var(--char);background:#fff;max-width:260px}
+  .plate span{background:#0a3ea8;color:#fff;font-weight:700;font-size:12px;padding:0 6px;display:grid;place-items:center}
+  .plate input{border:0;font-family:"Barlow Condensed";font-size:26px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;width:100%;text-align:center}
+  .ok{display:none;grid-column:span 2;background:#ecfdf3;color:#05603a;padding:12px;font-weight:600}
+  .hours li{list-style:none;display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
+  .hours li.today{color:var(--red);font-weight:700}
+  footer{background:var(--char);color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:26px;padding-bottom:26px}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.track{transition:none}html{scroll-behavior:auto}}
+  @media (max-width:960px){.hero{background:var(--char)}.hero .wrap{grid-template-columns:1fr}.car{justify-self:center;width:100%}.prices{grid-template-columns:1fr 1fr}.why{grid-template-columns:1fr 1fr}.rdv{grid-template-columns:1fr}}
+  @media (max-width:720px){
+    .menu{position:fixed;inset:76px 0 auto 0;background:var(--steel);flex-direction:column;padding:24px;transform:translateY(-130%);transition:transform .25s}
+    .menu.open{transform:none}.burger{display:block}header .btn{display:none}
+    .prices,.why{grid-template-columns:1fr}.rdv form{grid-template-columns:1fr;padding:22px}.rdv .full,.ok{grid-column:span 1}
+    section{padding:64px 0}.slide{padding:0 8px}
+  }
+</style>
+</head>
+<body>
+  <div class="top"><div class="wrap"><span>📍 42 route de Rennes, Nantes</span><span id="openNow">Ouvert aujourd’hui</span></div></div>
+  <header><div class="wrap">
+    <a href="#" class="logo"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#e10600" stroke-width="4"/><circle cx="20" cy="20" r="6" fill="#fff"/><path d="M20 3v8M20 29v8M3 20h8M29 20h8" stroke="#fff" stroke-width="3"/></svg>GARAGE <span>MOREAU</span></a>
+    <nav class="menu" id="menu"><a href="#tarifs">Tarifs</a><a href="#atelier">L’atelier</a><a href="#avis">Avis</a><a href="#rdv">Rendez-vous</a></nav>
+    <a href="#rdv" class="btn">Prendre RDV</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div></header>
+
+  <section class="hero" style="padding:0"><div class="wrap">
+    <div class="reveal">
+      <span class="kick">Mécanique toutes marques</span>
+      <h1>Entretien auto <em>prix affichés</em>, voiture rendue le soir.</h1>
+      <p>Révision constructeur sans perdre la garantie, freins, pneus, clim, diagnostic électronique : un devis clair avant chaque intervention.</p>
+      <div class="ctas"><a href="#rdv" class="btn">Réserver un créneau</a><a href="#tarifs" class="btn out">Voir les tarifs</a></div>
+      <div class="kpis"><div><b>4,8★</b><span>540 avis</span></div><div><b>24 h</b><span>délai moyen</span></div><div><b>1 an</b><span>garantie pièces</span></div></div>
+    </div>
+    <svg class="car reveal" viewBox="0 0 600 260"><defs><linearGradient id="b" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff3b30"/><stop offset="1" stop-color="#a30400"/></linearGradient></defs><path d="M40 180c0-30 20-44 60-50l70-12 70-50c18-12 40-18 64-18h86c26 0 50 10 68 28l48 48 50 10c20 4 34 22 34 42v20H40Z" fill="url(#b)"/><path d="M262 76c14-10 30-14 48-14h50v62H210Z" fill="#cfe3f5" opacity=".85"/><path d="M372 62h20c18 0 34 8 46 20l40 42H372Z" fill="#cfe3f5" opacity=".85"/><rect x="40" y="196" width="520" height="12" rx="6" fill="#0d0e10"/><g><circle cx="150" cy="208" r="40" fill="#0d0e10"/><circle cx="150" cy="208" r="20" fill="#9aa3ad"/><circle cx="450" cy="208" r="40" fill="#0d0e10"/><circle cx="450" cy="208" r="20" fill="#9aa3ad"/></g><rect x="530" y="150" width="30" height="10" rx="3" fill="#ffd8a8"/></svg>
+  </div></section>
+
+  <section id="tarifs"><div class="wrap">
+    <div class="reveal"><span class="kick">Tarifs</span><h2>Des prix clairs, main-d’œuvre comprise</h2><p class="sub">Tarifs TTC pour une citadine. Le prix exact de votre véhicule est confirmé avant intervention.</p></div>
+    <div class="filters" id="filters"><button class="on" data-f="all">Tout</button><button data-f="entretien">Entretien</button><button data-f="freinage">Freinage</button><button data-f="pneus">Pneus</button><button data-f="confort">Confort</button></div>
+    <div class="prices">
+      <div class="pr reveal" data-c="entretien"><span class="cat">Entretien</span><h3>Vidange + filtre</h3><p>Huile constructeur, filtre à huile, contrôle 30 points.</p><div class="amt">89 € <small>TTC</small></div></div>
+      <div class="pr reveal" data-c="entretien"><span class="cat">Entretien</span><h3>Révision constructeur</h3><p>Selon le carnet, garantie constructeur préservée.</p><div class="amt">189 € <small>dès</small></div></div>
+      <div class="pr reveal" data-c="entretien"><span class="cat">Entretien</span><h3>Kit distribution</h3><p>Courroie, galets et pompe à eau, pièces d’origine.</p><div class="amt">449 € <small>dès</small></div></div>
+      <div class="pr reveal" data-c="freinage"><span class="cat">Freinage</span><h3>Plaquettes avant</h3><p>Remplacement et contrôle des disques et du liquide.</p><div class="amt">119 € <small>TTC</small></div></div>
+      <div class="pr reveal" data-c="freinage"><span class="cat">Freinage</span><h3>Disques + plaquettes</h3><p>Essieu avant complet, essai routier inclus.</p><div class="amt">259 € <small>TTC</small></div></div>
+      <div class="pr reveal" data-c="pneus"><span class="cat">Pneus</span><h3>Montage & équilibrage</h3><p>Par pneu, valve neuve et recyclage de l’ancien.</p><div class="amt">19 € <small>/pneu</small></div></div>
+      <div class="pr reveal" data-c="pneus"><span class="cat">Pneus</span><h3>Géométrie</h3><p>Parallélisme sur banc 3D, rapport imprimé.</p><div class="amt">69 € <small>TTC</small></div></div>
+      <div class="pr reveal" data-c="confort"><span class="cat">Confort</span><h3>Recharge clim</h3><p>Recharge gaz, contrôle d’étanchéité et désinfection.</p><div class="amt">79 € <small>TTC</small></div></div>
+      <div class="pr reveal" data-c="confort"><span class="cat">Confort</span><h3>Diagnostic électronique</h3><p>Lecture des codes défaut, effacement, rapport.</p><div class="amt">49 € <small>TTC</small></div></div>
+    </div>
+  </div></section>
+
+  <section id="atelier" class="dark"><div class="wrap">
+    <div class="reveal"><span class="kick">L’atelier</span><h2 style="color:#fff">Pourquoi nous choisir</h2></div>
+    <div class="why reveal">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/></svg><b>Garantie préservée</b><p>Pièces qualité d’origine et cachet sur le carnet d’entretien.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><b>Rendue le soir</b><p>Dépôt le matin, récupération le soir pour 90 % des interventions.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>Devis avant tout</b><p>Aucun travail supplémentaire sans votre accord par SMS.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14l-1.5-6h-11Z"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg><b>Véhicule de prêt</b><p>Une citadine prêtée gratuitement sur réservation.</p></div>
+    </div>
+  </div></section>
+
+  <section id="avis"><div class="wrap">
+    <div class="reveal" style="text-align:center"><span class="kick">Avis Google</span><h2>Ce que disent nos clients</h2></div>
+    <div class="slider"><div class="track" id="track">
+      <div class="slide"><blockquote>« Prix annoncé au téléphone = prix payé. Voiture prête à 17 h comme prévu. Enfin un garage honnête. »</blockquote><cite>Julien · Clio IV</cite></div>
+      <div class="slide"><blockquote>« Ils m’ont appelé avant de changer les disques et envoyé une photo. Transparence totale. »</blockquote><cite>Nadia · Peugeot 3008</cite></div>
+      <div class="slide"><blockquote>« Révision faite sans perdre ma garantie, 40 % moins cher que la concession. »</blockquote><cite>Pierre · Toyota Yaris</cite></div>
+    </div></div>
+    <div class="dots" id="dots"></div>
+  </div></section>
+
+  <section id="rdv" style="background:var(--fog)"><div class="wrap rdv">
+    <div class="reveal">
+      <span class="kick">Rendez-vous</span><h2>Réservez en ligne</h2>
+      <p class="sub">Choisissez la prestation et la date : nous confirmons par SMS dans l’heure.</p>
+      <ul class="hours" id="hours" style="margin-top:24px"></ul>
+    </div>
+    <form id="form" class="reveal" novalidate>
+      <label class="full">Immatriculation<div class="plate"><span>F</span><input name="plaque" id="plaque" placeholder="AB-123-CD" maxlength="9" required></div></label>
+      <label>Prestation<select name="presta" required><option value="">Choisir…</option><option>Vidange + filtre</option><option>Révision constructeur</option><option>Freinage</option><option>Pneus</option><option>Climatisation</option><option>Diagnostic</option></select></label>
+      <label>Date<input type="date" name="date" id="date" required></label>
+      <label>Nom<input name="nom" required></label>
+      <label>Téléphone<input type="tel" name="tel" required></label>
+      <button class="btn full" style="justify-content:center">Confirmer le rendez-vous</button>
+      <p class="ok" id="ok"></p>
+    </form>
+  </div></section>
+
+  <footer><div class="wrap"><span>© <span id="y"></span> Garage Moreau · Nantes</span><span>Site de démonstration — entreprise fictive</span></div></footer>
+
+<script>
+  const menu = document.getElementById('menu')
+  document.getElementById('burger').addEventListener('click', () => menu.classList.toggle('open'))
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.classList.remove('open')))
+  // Filtre des tarifs
+  document.querySelectorAll('#filters button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('#filters button').forEach((x) => x.classList.toggle('on', x === b))
+    document.querySelectorAll('.pr').forEach((p) => p.classList.toggle('hide', b.dataset.f !== 'all' && p.dataset.c !== b.dataset.f))
+  }))
+  // Carrousel d'avis
+  const track = document.getElementById('track'), n = track.children.length, dots = document.getElementById('dots')
+  let i = 0, timer
+  for (let k = 0; k < n; k++) { const d = document.createElement('button'); d.setAttribute('aria-label', 'Avis ' + (k + 1)); d.onclick = () => go(k, true); dots.appendChild(d) }
+  const go = (k, user) => { i = (k + n) % n; track.style.transform = `translateX(-${i * 100}%)`; [...dots.children].forEach((d, j) => d.classList.toggle('on', j === i)); if (user) { clearInterval(timer); timer = setInterval(() => go(i + 1), 6000) } }
+  go(0); timer = setInterval(() => go(i + 1), 6000)
+  // Horaires + jour courant
+  const H = [['Lundi', '8 h – 18 h 30'], ['Mardi', '8 h – 18 h 30'], ['Mercredi', '8 h – 18 h 30'], ['Jeudi', '8 h – 18 h 30'], ['Vendredi', '8 h – 18 h'], ['Samedi', '9 h – 12 h'], ['Dimanche', 'Fermé']]
+  const today = (new Date().getDay() + 6) % 7
+  document.getElementById('hours').innerHTML = H.map(([d, h], k) => `<li class="${k === today ? 'today' : ''}"><span>${d}</span><span>${h}</span></li>`).join('')
+  document.getElementById('openNow').textContent = today === 6 ? 'Fermé aujourd’hui · RDV en ligne 24h/24' : `Ouvert aujourd’hui : ${H[today][1]}`
+  // Plaque : format AB-123-CD
+  const plaque = document.getElementById('plaque')
+  plaque.addEventListener('input', () => { const v = plaque.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7); plaque.value = [v.slice(0, 2), v.slice(2, 5), v.slice(5)].filter(Boolean).join('-') })
+  // Date : à partir de demain, pas le dimanche
+  const date = document.getElementById('date'), t = new Date(); t.setDate(t.getDate() + 1); date.min = t.toISOString().slice(0, 10)
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const f = e.target, bad = [...f.querySelectorAll('[required]')].filter((x) => !x.value.trim())
+    const sunday = date.value && new Date(date.value + 'T12:00').getDay() === 0
+    if (sunday) bad.push(date)
+    if (!/^[A-Z]{2}-\d{3}-[A-Z]{2}$/.test(plaque.value)) bad.push(plaque)
+    f.querySelectorAll('[required]').forEach((x) => x.style.outline = bad.includes(x) ? '2px solid #e10600' : '')
+    if (bad.length) return
+    const ok = document.getElementById('ok'); ok.style.display = 'block'
+    ok.textContent = `Merci ${f.nom.value} ! RDV ${f.presta.value.toLowerCase()} pour ${plaque.value} le ${new Date(date.value + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}. Confirmation par SMS.`
+  })
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }), { threshold: .1 })
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el))
+  document.getElementById('y').textContent = new Date().getFullYear()
+</script>
+</body>
+</html>

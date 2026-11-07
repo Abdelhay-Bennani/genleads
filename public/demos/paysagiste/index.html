@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdure & Co — Paysagiste à Aix-en-Provence</title>
+<meta name="description" content="Paysagiste à Aix-en-Provence : création de jardins méditerranéens, entretien, arrosage automatique et terrasses.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--forest:#1f3d2b;--leaf:#4f7a3a;--sage:#a8c49a;--cream:#f6f1e7;--sand:#e9dfcb;--clay:#c56b3d;--ink:#1d261f;--muted:#5f6b5f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"DM Sans",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.01em}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;font-weight:700;border:0;cursor:pointer;font:inherit;font-weight:700;transition:background .2s,transform .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-dark{background:var(--forest);color:var(--cream)}
+  .btn-line{border:1.5px solid var(--forest);color:var(--forest)}
+  nav{position:absolute;top:0;left:0;right:0;z-index:40}
+  nav .wrap{display:flex;justify-content:space-between;align-items:center;height:84px}
+  .logo{font-family:Fraunces,serif;font-size:24px;font-weight:700;color:var(--cream);display:flex;gap:10px;align-items:center}
+  .links{display:flex;gap:30px;color:#e7efe0;font-weight:500}
+  .links a:hover{color:#fff}
+  .burger{display:none;background:none;border:0;color:#fff;font-size:28px;cursor:pointer}
+  .hero{min-height:720px;position:relative;color:var(--cream);display:flex;align-items:flex-end;padding-bottom:88px;overflow:hidden;
+    background:linear-gradient(180deg,rgba(18,38,26,.2),rgba(18,38,26,.85)),radial-gradient(900px 500px at 75% 20%,#7aa35e 0%,transparent 70%),linear-gradient(160deg,#335c34,#16301f)}
+  .hills{position:absolute;inset:auto 0 0 0;width:100%;height:360px}
+  .hero .wrap{position:relative;z-index:1;width:100%}
+  .eyebrow{text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:700;color:var(--sage)}
+  .hero h1{font-size:clamp(42px,6.4vw,84px);line-height:1;margin:16px 0 22px;max-width:860px}
+  .hero h1 i{font-style:italic;color:var(--sage)}
+  .hero p{max-width:520px;font-size:18px;color:#dfe8d6;margin-bottom:30px}
+  .hero .btn-dark{background:var(--cream);color:var(--forest)}
+  .hero .btn-line{border-color:var(--cream);color:var(--cream)}
+  .hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+  .badge{background:rgba(246,241,231,.12);backdrop-filter:blur(8px);border:1px solid rgba(246,241,231,.25);padding:18px 22px;border-radius:20px;max-width:260px}
+  .badge b{font-family:Fraunces,serif;font-size:34px;display:block}
+  section{padding:104px 0}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+  h2{font-size:clamp(32px,4vw,52px);line-height:1.05;max-width:620px}
+  .lede{color:var(--muted);max-width:420px}
+  .tabs{display:flex;gap:8px;background:var(--sand);padding:6px;border-radius:999px;width:max-content;max-width:100%;overflow:auto}
+  .tabs button{border:0;background:none;font:inherit;font-weight:700;padding:10px 20px;border-radius:999px;cursor:pointer;color:var(--muted);white-space:nowrap}
+  .tabs button.on{background:var(--forest);color:var(--cream)}
+  .season{display:none;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:32px}
+  .season.on{display:grid}
+  .svc{background:#fff;border-radius:24px;padding:30px;border:1px solid var(--sand)}
+  .svc .n{font-family:Fraunces,serif;color:var(--clay);font-size:15px}
+  .svc h3{font-size:24px;margin:10px 0}
+  .svc p{color:var(--muted)}
+  .ba{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:16/8;user-select:none;touch-action:none;box-shadow:0 30px 60px -30px rgba(31,61,43,.6)}
+  .ba .layer{position:absolute;inset:0}
+  .before{background:linear-gradient(180deg,#d9cfb8 0%,#c9b995 55%,#a8956d 100%)}
+  .after{background:linear-gradient(180deg,#bcd7ef 0%,#e8f1e2 40%,#79a65c 41%,#4f7a3a 100%);clip-path:inset(0 0 0 50%)}
+  .ba .label{position:absolute;top:18px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px;background:rgba(255,255,255,.85)}
+  .handle{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%)}
+  .handle:after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;color:var(--forest);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .gallery{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:18px}
+  .tile{border-radius:22px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:20px;color:#fff;font-weight:700}
+  .tile span{background:rgba(0,0,0,.28);padding:6px 12px;border-radius:999px;backdrop-filter:blur(6px);font-size:14px}
+  .t1{grid-row:span 2;background:radial-gradient(circle at 30% 30%,#9cc77d,transparent 45%),linear-gradient(160deg,#4f7a3a,#1f3d2b)}
+  .t2{background:linear-gradient(140deg,#c56b3d,#e5b37e)}
+  .t3{background:linear-gradient(140deg,#6b8f9e,#c8dce3)}
+  .t4{grid-column:span 2;background:repeating-linear-gradient(90deg,#8a6b4c 0 18px,#7a5d41 18px 20px)}
+  .quote{background:var(--forest);color:var(--cream);border-radius:32px;padding:64px;display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:center}
+  .quote blockquote{font-family:Fraunces,serif;font-size:clamp(22px,2.6vw,32px);line-height:1.3}
+  .quote cite{display:block;margin-top:18px;font-style:normal;color:var(--sage)}
+  form.contact{background:var(--cream);color:var(--ink);border-radius:24px;padding:28px;display:grid;gap:12px}
+  form.contact input,form.contact select,form.contact textarea{font:inherit;padding:13px 15px;border-radius:14px;border:1px solid var(--sand);background:#fff}
+  form.contact input:focus,form.contact select:focus,form.contact textarea:focus{outline:2px solid var(--leaf)}
+  .ok{display:none;color:var(--leaf);font-weight:700}
+  footer{padding:48px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--sand);padding-top:28px}
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+  @media (max-width:900px){
+    .season{grid-template-columns:1fr}
+    .gallery{grid-template-columns:1fr 1fr;grid-template-rows:200px 200px 200px}
+    .t1{grid-row:span 1;grid-column:span 2}
+    .quote{grid-template-columns:1fr;padding:36px}
+    .ba{aspect-ratio:4/3}
+  }
+  @media (max-width:720px){
+    .links{position:fixed;inset:0;background:var(--forest);flex-direction:column;justify-content:center;align-items:center;font-size:24px;transform:translateX(100%);transition:transform .3s}
+    .links.open{transform:none}
+    .burger{display:block;position:relative;z-index:50}
+    section{padding:72px 0}
+    .hero{min-height:640px}
+  }
+</style>
+</head>
+<body>
+  <nav><div class="wrap">
+    <a href="#" class="logo"><svg width="30" height="30" viewBox="0 0 32 32"><path d="M16 29V14" stroke="#a8c49a" stroke-width="2.5"/><path d="M16 15C16 8 21 3 28 3c0 7-5 12-12 12ZM16 19C16 13 11 9 4 9c0 6 5 10 12 10Z" fill="#a8c49a"/></svg>Verdure & Co</a>
+    <div class="links" id="links"><a href="#saisons">Services</a><a href="#avant-apres">Avant / après</a><a href="#realisations">Réalisations</a><a href="#contact">Contact</a></div>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div></nav>
+
+  <header class="hero">
+    <svg class="hills" viewBox="0 0 1440 360" preserveAspectRatio="none"><path d="M0 220 C240 140 420 260 720 190 S1200 120 1440 200 V360 H0Z" fill="#244a30" opacity=".75"/><path d="M0 290 C300 230 520 320 860 270 S1260 230 1440 280 V360 H0Z" fill="#1a3423"/></svg>
+    <div class="wrap">
+      <span class="eyebrow">Paysagiste · Pays d’Aix</span>
+      <h1>Des jardins qui <i>respirent</i> la Provence.</h1>
+      <div class="hero-row">
+        <div>
+          <p>Conception, création et entretien de jardins méditerranéens économes en eau, de la première esquisse à la dernière plantation.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap"><a href="#contact" class="btn btn-dark">Visite conseil offerte</a><a href="#realisations" class="btn btn-line">Voir nos jardins</a></div>
+        </div>
+        <div class="badge"><b>-60 %</b>d’arrosage grâce aux plantes adaptées au climat</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="saisons"><div class="wrap">
+    <div class="head reveal"><h2>Un jardin soigné, saison après saison</h2><p class="lede">Choisissez la saison pour voir ce que nous faisons pour votre extérieur.</p></div>
+    <div class="tabs reveal" role="tablist">
+      <button class="on" data-s="printemps">Printemps</button><button data-s="ete">Été</button><button data-s="automne">Automne</button><button data-s="hiver">Hiver</button>
+    </div>
+    <div class="season on" id="printemps">
+      <div class="svc"><div class="n">01</div><h3>Création de massifs</h3><p>Plantes vivaces, graminées et aromatiques choisies pour fleurir longtemps.</p></div>
+      <div class="svc"><div class="n">02</div><h3>Gazon & prairies</h3><p>Semis, plaquage ou prairie fleurie à faible entretien.</p></div>
+      <div class="svc"><div class="n">03</div><h3>Potager surélevé</h3><p>Carrés en bois, terreau bio et plan de culture personnalisé.</p></div>
+    </div>
+    <div class="season" id="ete">
+      <div class="svc"><div class="n">01</div><h3>Arrosage automatique</h3><p>Goutte-à-goutte programmable et sonde d’humidité connectée.</p></div>
+      <div class="svc"><div class="n">02</div><h3>Terrasses bois</h3><p>Pin traité ou bois exotique, pergolas et voiles d’ombrage.</p></div>
+      <div class="svc"><div class="n">03</div><h3>Entretien estival</h3><p>Tonte, désherbage manuel et contrôle des plantes en pot.</p></div>
+    </div>
+    <div class="season" id="automne">
+      <div class="svc"><div class="n">01</div><h3>Plantation d’arbres</h3><p>La meilleure saison pour planter oliviers, chênes verts et fruitiers.</p></div>
+      <div class="svc"><div class="n">02</div><h3>Paillage</h3><p>Paillis minéral ou végétal pour protéger le sol et limiter l’arrosage.</p></div>
+      <div class="svc"><div class="n">03</div><h3>Ramassage des feuilles</h3><p>Évacuation et compostage sur place si vous le souhaitez.</p></div>
+    </div>
+    <div class="season" id="hiver">
+      <div class="svc"><div class="n">01</div><h3>Taille des arbres</h3><p>Taille douce, élagage et soins des oliviers par nos arboristes.</p></div>
+      <div class="svc"><div class="n">02</div><h3>Murets en pierre sèche</h3><p>Restanques et murets traditionnels montés à la main.</p></div>
+      <div class="svc"><div class="n">03</div><h3>Projet de l’année</h3><p>Plan 3D de votre futur jardin, prêt pour le printemps.</p></div>
+    </div>
+  </div></section>
+
+  <section id="avant-apres" style="padding-top:0"><div class="wrap">
+    <div class="head reveal"><h2>Avant / après</h2><p class="lede">Faites glisser le curseur : un terrain nu transformé en jardin sec à Puyricard.</p></div>
+    <div class="ba reveal" id="ba">
+      <div class="layer before"><svg width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="none"><g fill="#b39f78"><ellipse cx="160" cy="330" rx="90" ry="12"/><ellipse cx="520" cy="350" rx="140" ry="14"/></g><path d="M600 300l20-60 20 60z" fill="#8f7c57"/></svg></div>
+      <div class="layer after" id="after"><svg width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="none"><circle cx="640" cy="90" r="40" fill="#fff6c8"/><g fill="#2f5a2b"><circle cx="150" cy="210" r="70"/><circle cx="220" cy="230" r="55"/><rect x="176" y="250" width="12" height="70" fill="#6b4e2e"/></g><g fill="#9c7bd1"><circle cx="420" cy="270" r="14"/><circle cx="450" cy="262" r="12"/><circle cx="480" cy="275" r="14"/><circle cx="510" cy="265" r="11"/></g><path d="M300 400 C380 320 520 320 600 400" fill="#d8cbb0"/></svg></div>
+      <span class="label" style="left:18px">Avant</span><span class="label" style="right:18px">Après</span>
+      <div class="handle" id="handle"></div>
+    </div>
+  </div></section>
+
+  <section id="realisations" style="padding-top:0"><div class="wrap">
+    <div class="head reveal"><h2>Nos réalisations</h2><p class="lede">Plus de 180 jardins créés entre Aix, Marseille et le Luberon.</p></div>
+    <div class="gallery reveal">
+      <div class="tile t1"><span>Jardin sec · Puyricard</span></div>
+      <div class="tile t2"><span>Patio en terre cuite</span></div>
+      <div class="tile t3"><span>Bassin naturel</span></div>
+      <div class="tile t4"><span>Terrasse bois · Éguilles</span></div>
+    </div>
+  </div></section>
+
+  <section id="contact" style="padding-top:0"><div class="wrap">
+    <div class="quote reveal">
+      <div>
+        <blockquote>« Notre terrain n’était que cailloux. Un an plus tard, c’est la pièce préférée de la maison. »</blockquote>
+        <cite>— Claire et Antoine, Venelles</cite>
+      </div>
+      <form class="contact" id="form" novalidate>
+        <strong style="font-family:Fraunces,serif;font-size:22px">Visite conseil gratuite</strong>
+        <input name="nom" placeholder="Votre nom" required>
+        <input name="tel" type="tel" placeholder="Téléphone" required>
+        <select name="projet" required><option value="">Votre projet…</option><option>Création de jardin</option><option>Entretien régulier</option><option>Terrasse / aménagement</option><option>Arrosage automatique</option></select>
+        <textarea name="msg" rows="3" placeholder="Surface, envies, contraintes…"></textarea>
+        <button class="btn btn-dark" style="justify-content:center">Planifier la visite</button>
+        <p class="ok" id="ok">Merci ! Nous vous appelons sous 24 h pour fixer la visite.</p>
+      </form>
+    </div>
+  </div></section>
+
+  <footer><div class="wrap"><span>© <span id="y"></span> Verdure & Co · Paysagiste · Aix-en-Provence</span><span>Site de démonstration — entreprise fictive</span></div></footer>
+
+<script>
+  const links = document.getElementById('links')
+  document.getElementById('burger').addEventListener('click', () => links.classList.toggle('open'))
+  links.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => links.classList.remove('open')))
+  // Onglets saisons
+  document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b))
+    document.querySelectorAll('.season').forEach((s) => s.classList.toggle('on', s.id === b.dataset.s))
+  }))
+  // Saison courante par défaut
+  const m = new Date().getMonth(), cur = m < 2 || m === 11 ? 'hiver' : m < 5 ? 'printemps' : m < 8 ? 'ete' : 'automne'
+  document.querySelector(`.tabs button[data-s="${cur}"]`).click()
+  // Curseur avant / après (souris, tactile, clavier)
+  const ba = document.getElementById('ba'), after = document.getElementById('after'), handle = document.getElementById('handle')
+  const setPos = (x) => { const r = ba.getBoundingClientRect(), p = Math.max(0, Math.min(100, ((x - r.left) / r.width) * 100)); after.style.clipPath = `inset(0 0 0 ${p}%)`; handle.style.left = p + '%' }
+  let drag = false
+  ba.addEventListener('pointerdown', (e) => { drag = true; ba.setPointerCapture(e.pointerId); setPos(e.clientX) })
+  ba.addEventListener('pointermove', (e) => drag && setPos(e.clientX))
+  ba.addEventListener('pointerup', () => drag = false)
+  ba.tabIndex = 0
+  ba.addEventListener('keydown', (e) => { const p = parseFloat(handle.style.left || '50'); if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { const r = ba.getBoundingClientRect(); setPos(r.left + r.width * (p + (e.key === 'ArrowRight' ? 5 : -5)) / 100) } })
+  // Apparition au défilement
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }), { threshold: .12 })
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el))
+  // Formulaire (démo)
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const f = e.target, bad = [...f.querySelectorAll('[required]')].filter((i) => !i.value.trim())
+    f.querySelectorAll('[required]').forEach((i) => i.style.borderColor = bad.includes(i) ? '#c0392b' : '')
+    if (!bad.length) { document.getElementById('ok').style.display = 'block'; f.reset() }
+  })
+  document.getElementById('y').textContent = new Date().getFullYear()
+</script>
+</body>
+</html>

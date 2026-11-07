@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volta Électricité — Électricien à Toulouse</title>
+<meta name="description" content="Électricien à Toulouse : mise aux normes, rénovation électrique, bornes de recharge et domotique. Estimation en ligne.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--volt:#ffd400;--black:#0e0e10;--ink:#16161a;--gray:#f2f2ee;--muted:#6b6b72;--line:#e2e2dc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,.disp{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.02em}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;font-weight:700;border:2px solid var(--black);cursor:pointer;font:inherit;font-weight:700;background:var(--volt);color:var(--black);box-shadow:5px 5px 0 var(--black);transition:transform .12s,box-shadow .12s}
+  .btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--black)}
+  .btn.dark{background:var(--black);color:var(--volt);box-shadow:5px 5px 0 var(--volt)}
+  header{background:var(--black);color:#fff;position:sticky;top:0;z-index:40}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:74px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:"Space Grotesk";font-weight:700;font-size:22px}
+  .logo i{width:34px;height:34px;background:var(--volt);display:grid;place-items:center;color:var(--black);font-style:normal;clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%)}
+  .menu{display:flex;gap:30px;font-weight:500;color:#c9c9cf}
+  .menu a:hover{color:var(--volt)}
+  .burger{display:none;background:none;border:0;color:var(--volt);font-size:28px;cursor:pointer}
+  .hero{background:var(--volt);position:relative;overflow:hidden;border-bottom:2px solid var(--black)}
+  .hero .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center;padding-top:72px;padding-bottom:84px}
+  .hero h1{font-size:clamp(40px,6vw,80px);line-height:1.06;text-transform:uppercase}
+  .hero h1 span{background:var(--black);color:var(--volt);padding:0 10px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .hero p{font-size:19px;max-width:540px;margin:24px 0 32px;font-weight:500}
+  .bolt{width:100%;max-width:380px;justify-self:center}
+  .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+  .pills span{border:2px solid var(--black);padding:6px 12px;font-weight:700;font-size:13px;background:#fff}
+  .marquee{background:var(--black);color:var(--volt);overflow:hidden;white-space:nowrap;border-bottom:2px solid var(--black)}
+  .marquee div{display:inline-block;padding:14px 0;font-family:"Space Grotesk";font-weight:700;font-size:20px;text-transform:uppercase;animation:mq 22s linear infinite}
+  .marquee b{margin:0 28px;color:#fff}
+  @keyframes mq{to{transform:translateX(-50%)}}
+  section{padding:96px 0}
+  .kick{display:inline-block;background:var(--black);color:var(--volt);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px}
+  h2{font-size:clamp(32px,4.4vw,56px);line-height:1;margin:16px 0;text-transform:uppercase}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--black);margin-top:44px}
+  .cell{padding:28px;border-right:2px solid var(--black);transition:background .2s}
+  .cell:last-child{border-right:0}
+  .cell:hover{background:var(--volt)}
+  .cell .num{font-family:"Space Grotesk";font-weight:700;font-size:14px}
+  .cell h3{font-size:24px;margin:40px 0 10px;text-transform:uppercase;line-height:1.05}
+  .cell p{color:#3a3a40;font-size:15px}
+  .est{background:var(--gray);border-top:2px solid var(--black);border-bottom:2px solid var(--black)}
+  .est .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  .panel{background:#fff;border:2px solid var(--black);box-shadow:10px 10px 0 var(--black);padding:32px}
+  .panel label{display:block;font-weight:700;font-size:14px;margin:18px 0 8px}
+  .panel label:first-child{margin-top:0}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .opts button{border:2px solid var(--black);background:#fff;padding:12px;font:inherit;font-weight:600;cursor:pointer;text-align:left}
+  .opts button.on{background:var(--black);color:var(--volt)}
+  input[type=range]{width:100%;accent-color:#111}
+  .chk{display:flex;gap:10px;align-items:center;font-weight:500;margin-top:10px;cursor:pointer}
+  .chk input{width:20px;height:20px;accent-color:#111}
+  .result{margin-top:24px;background:var(--volt);border:2px solid var(--black);padding:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .result b{font-family:"Space Grotesk";font-size:34px;display:block;line-height:1}
+  .result small{font-weight:600}
+  .certs{display:flex;gap:18px;flex-wrap:wrap;margin-top:30px}
+  .certs div{border:2px solid var(--black);padding:12px 16px;font-weight:700;background:#fff}
+  .proj{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:44px}
+  .p{border:2px solid var(--black)}
+  .p .img{aspect-ratio:4/3;border-bottom:2px solid var(--black);background:repeating-linear-gradient(45deg,#16161a 0 14px,#1f1f24 14px 28px);display:grid;place-items:center}
+  .p .img svg{width:46%}
+  .p .txt{padding:18px}
+  .p h3{font-size:20px;text-transform:uppercase}
+  .p small{color:var(--muted);font-weight:600}
+  .contact{background:var(--black);color:#fff}
+  .contact .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  .contact h2{color:var(--volt)}
+  .contact p{color:#b4b4bb}
+  .contact .big{font-family:"Space Grotesk";font-size:36px;color:var(--volt);font-weight:700;display:block;margin:20px 0 6px}
+  form{display:grid;gap:12px}
+  form input,form textarea,form select{font:inherit;padding:14px;border:2px solid #fff;background:transparent;color:#fff}
+  form input:focus,form textarea:focus,form select:focus{outline:none;border-color:var(--volt)}
+  form option{color:#111}
+  .ok{display:none;color:var(--volt);font-weight:700}
+  footer{background:var(--black);color:#8a8a92;border-top:1px solid #2a2a30;font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:22px;padding-bottom:22px}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.marquee div{animation:none}html{scroll-behavior:auto}}
+  @media (max-width:960px){.hero .wrap,.est .wrap,.contact .wrap{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.cell:nth-child(2){border-right:0}.cell:nth-child(-n+2){border-bottom:2px solid var(--black)}.proj{grid-template-columns:1fr 1fr}.bolt{max-width:220px}}
+  @media (max-width:720px){
+    .menu{position:fixed;inset:74px 0 auto 0;background:var(--black);flex-direction:column;padding:24px;gap:18px;transform:translateY(-130%);transition:transform .25s}
+    .menu.open{transform:none}.burger{display:block}header .btn{display:none}
+    .grid,.proj{grid-template-columns:1fr}.cell{border-right:0;border-bottom:2px solid var(--black)}.cell:last-child{border-bottom:0}
+    section{padding:64px 0}.panel{box-shadow:6px 6px 0 var(--black);padding:22px}
+  }
+</style>
+</head>
+<body>
+  <header><div class="wrap">
+    <a href="#" class="logo"><i>⚡</i>VOLTA</a>
+    <nav class="menu" id="menu"><a href="#services">Services</a><a href="#estimation">Estimation</a><a href="#chantiers">Chantiers</a><a href="#contact">Contact</a></nav>
+    <a href="#estimation" class="btn">Estimer mes travaux</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div></header>
+
+  <section class="hero" style="padding:0"><div class="wrap">
+    <div class="reveal">
+      <h1>Votre électricité <span>aux normes</span>, sans prise de tête.</h1>
+      <p>Électriciens certifiés à Toulouse : mise en conformité NF C 15-100, rénovation complète, bornes de recharge et maison connectée.</p>
+      <a href="#estimation" class="btn dark">Estimation en 30 secondes →</a>
+      <div class="pills"><span>Qualifelec</span><span>IRVE</span><span>Garantie décennale</span><span>Devis sous 24 h</span></div>
+    </div>
+    <svg class="bolt reveal" viewBox="0 0 200 260"><path d="M120 0 20 150h70l-20 110L180 100h-72L140 0Z" fill="#0e0e10"/><path d="M120 0 20 150h70l-20 110L180 100h-72L140 0Z" fill="none" stroke="#fff" stroke-width="3" transform="translate(-8 -8)"/></svg>
+  </div></section>
+  <div class="marquee" aria-hidden="true"><div>Mise aux normes<b>✦</b>Tableau électrique<b>✦</b>Borne de recharge<b>✦</b>Domotique<b>✦</b>Éclairage LED<b>✦</b>Dépannage<b>✦</b>Mise aux normes<b>✦</b>Tableau électrique<b>✦</b>Borne de recharge<b>✦</b>Domotique<b>✦</b>Éclairage LED<b>✦</b>Dépannage<b>✦</b></div></div>
+
+  <section id="services"><div class="wrap">
+    <div class="reveal"><span class="kick">Services</span><h2>Ce qu’on fait le mieux</h2></div>
+    <div class="grid reveal">
+      <div class="cell"><span class="num">01</span><h3>Mise aux normes</h3><p>Diagnostic, tableau, différentiels et prise de terre conformes NF C 15-100.</p></div>
+      <div class="cell"><span class="num">02</span><h3>Rénovation complète</h3><p>Recâblage d’appartements et maisons anciennes, avec Consuel.</p></div>
+      <div class="cell"><span class="num">03</span><h3>Borne de recharge</h3><p>Installateur IRVE : wallbox 7 à 22 kW, aide ADVENIR en copropriété.</p></div>
+      <div class="cell"><span class="num">04</span><h3>Domotique</h3><p>Volets, chauffage et éclairage pilotés depuis votre téléphone.</p></div>
+    </div>
+  </div></section>
+
+  <section id="estimation" class="est"><div class="wrap">
+    <div class="reveal">
+      <span class="kick">Simulateur</span>
+      <h2>Combien coûtent vos travaux&nbsp;?</h2>
+      <p style="font-size:18px;max-width:460px">Une fourchette indicative tout de suite, un devis précis et gratuit après visite technique.</p>
+      <div class="certs"><div>✓ Devis gratuit</div><div>✓ Prix ferme</div><div>✓ Garantie 10 ans</div></div>
+    </div>
+    <div class="panel reveal">
+      <label>Type de travaux</label>
+      <div class="opts" id="type">
+        <button class="on" data-base="85" data-unit="m2">Rénovation complète</button>
+        <button data-base="45" data-unit="m2">Mise aux normes</button>
+        <button data-base="1290" data-unit="forfait">Borne de recharge</button>
+        <button data-base="1150" data-unit="forfait">Tableau électrique</button>
+      </div>
+      <div id="surfBlock"><label>Surface : <span id="surfOut">80</span> m²</label><input type="range" id="surf" min="20" max="250" step="5" value="80"></div>
+      <label class="chk"><input type="checkbox" id="old"> Logement de plus de 30 ans</label>
+      <label class="chk"><input type="checkbox" id="domo"> Ajouter un pack domotique (+ 890 €)</label>
+      <div class="result"><div><small>Estimation TTC</small><b id="price">—</b></div><a href="#contact" class="btn dark">Devis précis</a></div>
+    </div>
+  </div></section>
+
+  <section id="chantiers"><div class="wrap">
+    <div class="reveal"><span class="kick">Réalisations</span><h2>Chantiers récents</h2></div>
+    <div class="proj">
+      <div class="p reveal"><div class="img"><svg viewBox="0 0 100 100"><rect x="20" y="10" width="60" height="80" fill="none" stroke="#ffd400" stroke-width="4"/><g fill="#ffd400"><rect x="30" y="22" width="8" height="18"/><rect x="42" y="22" width="8" height="18"/><rect x="54" y="22" width="8" height="18"/><rect x="30" y="52" width="8" height="18"/><rect x="42" y="52" width="8" height="18"/></g></svg></div><div class="txt"><h3>Tableau neuf T4</h3><small>Toulouse Minimes · 2 jours</small></div></div>
+      <div class="p reveal"><div class="img"><svg viewBox="0 0 100 100"><rect x="34" y="14" width="32" height="56" rx="6" fill="none" stroke="#ffd400" stroke-width="4"/><path d="M50 26 42 44h8l-4 14 12-20h-8l4-12Z" fill="#ffd400"/><path d="M50 70v16h22" stroke="#ffd400" stroke-width="4" fill="none"/></svg></div><div class="txt"><h3>Borne 11 kW</h3><small>Balma · copropriété 24 lots</small></div></div>
+      <div class="p reveal"><div class="img"><svg viewBox="0 0 100 100"><path d="M18 50 50 22l32 28v34H18Z" fill="none" stroke="#ffd400" stroke-width="4"/><circle cx="50" cy="58" r="10" fill="none" stroke="#ffd400" stroke-width="4"/><path d="M50 40v-6M66 58h6M28 58h6" stroke="#ffd400" stroke-width="4"/></svg></div><div class="txt"><h3>Maison connectée</h3><small>Colomiers · 140 m²</small></div></div>
+    </div>
+  </div></section>
+
+  <section id="contact" class="contact"><div class="wrap">
+    <div class="reveal"><span class="kick" style="background:var(--volt);color:var(--black)">Contact</span><h2>Parlons de votre projet</h2><p>Visite technique gratuite sous 72 h dans un rayon de 30 km autour de Toulouse.</p><a href="tel:0561000000" class="big">05 61 00 00 00</a><p>Lun – Ven · 7 h 30 – 19 h · Urgences le samedi</p></div>
+    <form id="form" class="reveal" novalidate>
+      <input name="nom" placeholder="Nom" required>
+      <input name="tel" type="tel" placeholder="Téléphone" required>
+      <select name="type" id="formType"><option>Rénovation complète</option><option>Mise aux normes</option><option>Borne de recharge</option><option>Tableau électrique</option><option>Autre</option></select>
+      <textarea name="msg" rows="4" placeholder="Décrivez votre besoin"></textarea>
+      <button class="btn">Envoyer la demande</button>
+      <p class="ok" id="ok">Reçu ! Un électricien vous rappelle dans la journée.</p>
+    </form>
+  </div></section>
+  <footer><div class="wrap"><span>© <span id="y"></span> Volta Électricité · Toulouse</span><span>Site de démonstration — entreprise fictive</span></div></footer>
+
+<script>
+  const menu = document.getElementById('menu')
+  document.getElementById('burger').addEventListener('click', () => menu.classList.toggle('open'))
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.classList.remove('open')))
+  // Estimateur
+  const btns = [...document.querySelectorAll('#type button')], surf = document.getElementById('surf'), out = document.getElementById('surfOut')
+  const old = document.getElementById('old'), domo = document.getElementById('domo'), price = document.getElementById('price')
+  const fmt = (n) => (Math.round(n / 10) * 10).toLocaleString('fr-FR') + ' €'
+  const calc = () => {
+    const b = btns.find((x) => x.classList.contains('on')), m2 = b.dataset.unit === 'm2'
+    document.getElementById('surfBlock').style.display = m2 ? '' : 'none'
+    out.textContent = surf.value
+    let base = m2 ? +b.dataset.base * +surf.value : +b.dataset.base
+    if (old.checked) base *= 1.18
+    if (domo.checked) base += 890
+    price.textContent = `${fmt(base * .9)} – ${fmt(base * 1.15)}`
+    document.getElementById('formType').value = b.textContent
+  }
+  btns.forEach((b) => b.addEventListener('click', () => { btns.forEach((x) => x.classList.toggle('on', x === b)); calc() }))
+  ;[surf, old, domo].forEach((el) => el.addEventListener('input', calc)); calc()
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }), { threshold: .12 })
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el))
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const f = e.target, bad = [...f.querySelectorAll('[required]')].filter((i) => !i.value.trim())
+    f.querySelectorAll('[required]').forEach((i) => i.style.borderColor = bad.includes(i) ? '#ff5a5a' : '')
+    if (!bad.length) { document.getElementById('ok').style.display = 'block'; f.reset() }
+  })
+  document.getElementById('y').textContent = new Date().getFullYear()
+</script>
+</body>
+</html>

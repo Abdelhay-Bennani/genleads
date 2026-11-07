@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Comptoir des Halles — Bistrot de saison à Lyon</title>
+<meta name="description" content="Bistrot de saison à Lyon : cuisine du marché, vins nature et réservation en ligne.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--night:#121110;--coal:#1c1a18;--paper:#f3ece0;--gold:#c9a45c;--wine:#7a1f2b;--muted:#a59d90;--line:#2e2a26}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Jost,system-ui,sans-serif;font-weight:300;background:var(--night);color:var(--paper);line-height:1.7}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-block;padding:14px 30px;border:1px solid var(--gold);color:var(--gold);letter-spacing:.18em;text-transform:uppercase;font-size:13px;font-weight:500;background:none;cursor:pointer;font-family:inherit;transition:background .25s,color .25s}
+  .btn:hover,.btn.solid{background:var(--gold);color:var(--night)}
+  header{position:fixed;top:0;left:0;right:0;z-index:40;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(18,17,16,.92);backdrop-filter:blur(8px);border-color:var(--line)}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:80px}
+  .brand{font-family:"Cormorant Garamond",serif;font-size:26px;letter-spacing:.04em}
+  .brand small{display:block;font-family:Jost;font-size:10px;letter-spacing:.4em;color:var(--gold);margin-top:-4px}
+  .nav{display:flex;gap:34px;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+  .nav a:hover{color:var(--gold)}
+  .burger{display:none;background:none;border:0;color:var(--paper);font-size:26px;cursor:pointer}
+  .hero{min-height:760px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden;
+    background:radial-gradient(600px 400px at 50% 60%,rgba(201,164,92,.18),transparent 70%),radial-gradient(1000px 600px at 50% 120%,#3a1218 0%,transparent 60%),var(--night)}
+  .hero .plate{position:absolute;width:560px;height:560px;border-radius:50%;border:1px solid rgba(201,164,92,.2);top:50%;left:50%;transform:translate(-50%,-50%)}
+  .hero .plate:after{content:"";position:absolute;inset:40px;border-radius:50%;border:1px solid rgba(201,164,92,.12)}
+  .hero-in{position:relative;z-index:1;padding:120px 24px 80px}
+  .eyebrow{color:var(--gold);letter-spacing:.4em;font-size:12px;text-transform:uppercase}
+  .hero h1{font-size:clamp(48px,8vw,104px);line-height:.95;margin:22px 0}
+  .hero h1 em{color:var(--gold)}
+  .hero p{max-width:520px;margin:0 auto 36px;color:var(--muted);font-size:18px}
+  .info{display:flex;justify-content:center;gap:48px;margin-top:56px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+  .info b{display:block;color:var(--paper);font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:12px;margin-bottom:4px}
+  section{padding:110px 0}
+  .title{text-align:center;margin-bottom:56px}
+  .title h2{font-size:clamp(38px,5vw,60px);line-height:1.05;margin-top:12px}
+  .story{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+  .story .art{aspect-ratio:4/5;background:linear-gradient(160deg,#2b211a,#14100d);border:1px solid var(--line);position:relative;overflow:hidden}
+  .story .art svg{position:absolute;inset:0;width:100%;height:100%}
+  .story h2{font-size:clamp(34px,4vw,52px);line-height:1.08;margin:14px 0 22px}
+  .story p{color:var(--muted);margin-bottom:16px}
+  .sign{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:26px;color:var(--gold)}
+  .tabs{display:flex;justify-content:center;gap:10px;margin-bottom:44px;flex-wrap:wrap}
+  .tabs button{background:none;border:0;color:var(--muted);font-family:inherit;font-size:14px;letter-spacing:.2em;text-transform:uppercase;padding:8px 18px;cursor:pointer;border-bottom:1px solid transparent}
+  .tabs button.on{color:var(--gold);border-color:var(--gold)}
+  .menu{display:none;grid-template-columns:1fr 1fr;gap:10px 64px;max-width:960px;margin:0 auto}
+  .menu.on{display:grid}
+  .dish{padding:18px 0;border-bottom:1px dashed var(--line)}
+  .dish .row{display:flex;align-items:baseline;gap:12px}
+  .dish h3{font-size:24px}
+  .dish .dots{flex:1;border-bottom:1px dotted #4a443d;transform:translateY(-6px)}
+  .dish .p{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--gold)}
+  .dish p{color:var(--muted);font-size:14px}
+  .tagv{font-size:10px;letter-spacing:.15em;border:1px solid #4d6b3c;color:#9ac27f;padding:1px 6px;margin-left:8px;vertical-align:middle}
+  .note{text-align:center;color:var(--muted);margin-top:36px;font-size:14px}
+  .band{background:var(--coal);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;text-align:center}
+  .quotes blockquote{font-family:"Cormorant Garamond",serif;font-size:24px;font-style:italic;line-height:1.35}
+  .quotes cite{display:block;margin-top:14px;font-style:normal;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;font-size:11px}
+  .resa{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
+  .resa h2{font-size:clamp(36px,4.4vw,56px);line-height:1.05;margin:12px 0 20px}
+  .resa p{color:var(--muted)}
+  .hours{margin-top:28px;border-top:1px solid var(--line)}
+  .hours div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+  form{background:var(--coal);border:1px solid var(--line);padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  form label{display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  form .full{grid-column:span 2}
+  input,select{font:inherit;font-size:16px;letter-spacing:0;text-transform:none;background:transparent;border:0;border-bottom:1px solid #4a443d;color:var(--paper);padding:10px 0;color-scheme:dark}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  select option{background:var(--coal)}
+  .stepper{display:flex;align-items:center;gap:18px;border-bottom:1px solid #4a443d;padding:6px 0}
+  .stepper button{width:34px;height:34px;border:1px solid var(--gold);background:none;color:var(--gold);font-size:18px;cursor:pointer}
+  .stepper output{font-size:20px;min-width:24px;text-align:center;color:var(--paper);font-family:"Cormorant Garamond",serif}
+  .ok{display:none;grid-column:span 2;color:var(--gold);font-family:"Cormorant Garamond",serif;font-size:22px;font-style:italic}
+  footer{padding:56px 0 32px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+  footer .brand{color:var(--paper);margin-bottom:12px}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity 1s ease,transform 1s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+  @media (max-width:900px){.story,.resa{grid-template-columns:1fr;gap:40px}.menu{grid-template-columns:1fr}.quotes{grid-template-columns:1fr}}
+  @media (max-width:720px){
+    .nav{position:fixed;inset:0;background:var(--night);flex-direction:column;align-items:center;justify-content:center;font-size:18px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .nav.open{opacity:1;pointer-events:auto}
+    .burger{display:block;position:relative;z-index:50}
+    form{grid-template-columns:1fr;padding:24px}form .full,.ok{grid-column:span 1}
+    section{padding:80px 0}.hero .plate{width:360px;height:360px}
+  }
+</style>
+</head>
+<body>
+  <header id="top"><div class="wrap">
+    <a href="#" class="brand">Le Comptoir<small>DES HALLES</small></a>
+    <nav class="nav" id="nav"><a href="#maison">La maison</a><a href="#carte">La carte</a><a href="#avis">Avis</a><a href="#reserver">Réserver</a></nav>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div></header>
+
+  <section class="hero" style="padding:0">
+    <div class="plate"></div>
+    <div class="hero-in">
+      <div class="eyebrow">Bistrot de saison · Lyon 2e</div>
+      <h1>Le marché <em>du jour</em>,<br>dans l’assiette.</h1>
+      <p>Une carte courte qui change chaque semaine, des producteurs à moins de 80 km et une cave de vins vivants.</p>
+      <a href="#reserver" class="btn solid">Réserver une table</a>
+      <div class="info"><div><b>Midi</b>12 h – 14 h 30</div><div><b>Soir</b>19 h – 22 h 30</div><div><b>Adresse</b>14 rue des Halles, Lyon</div></div>
+    </div>
+  </section>
+
+  <section id="maison"><div class="wrap story">
+    <div class="art reveal"><svg viewBox="0 0 400 500"><circle cx="200" cy="250" r="140" fill="none" stroke="#c9a45c" stroke-opacity=".35"/><circle cx="200" cy="250" r="96" fill="#2a1e17"/><path d="M150 250c20-40 80-40 100 0-20 28-80 28-100 0Z" fill="#7a1f2b" opacity=".85"/><circle cx="182" cy="236" r="9" fill="#9ac27f"/><circle cx="214" cy="232" r="6" fill="#c9a45c"/><path d="M95 420h210" stroke="#c9a45c" stroke-opacity=".4"/><text x="200" y="458" fill="#a59d90" font-family="Georgia" font-size="16" text-anchor="middle" font-style="italic">Pigeonneau, betterave, sureau</text></svg></div>
+    <div class="reveal">
+      <div class="eyebrow">La maison</div>
+      <h2>Une cuisine sincère, sans artifice.</h2>
+      <p>Installés face aux Halles depuis 2016, nous cuisinons ce que nos maraîchers, pêcheurs et éleveurs nous apportent le matin même.</p>
+      <p>Le résultat : une ardoise de quatre entrées, quatre plats et trois desserts, renouvelée chaque mardi.</p>
+      <p class="sign">Chef Élise Martin</p>
+    </div>
+  </div></section>
+
+  <section id="carte" class="band"><div class="wrap">
+    <div class="title reveal"><div class="eyebrow">Semaine 45</div><h2>La carte</h2></div>
+    <div class="tabs reveal"><button class="on" data-m="entrees">Entrées</button><button data-m="plats">Plats</button><button data-m="desserts">Desserts</button><button data-m="vins">Vins</button></div>
+    <div class="menu on" id="entrees">
+      <div class="dish"><div class="row"><h3>Velouté de potimarron</h3><span class="dots"></span><span class="p">11</span></div><p>Noisettes torréfiées, huile de sauge</p></div>
+      <div class="dish"><div class="row"><h3>Œuf parfait<span class="tagv">VÉGÉ</span></h3><span class="dots"></span><span class="p">13</span></div><p>Champignons des bois, crème de comté</p></div>
+      <div class="dish"><div class="row"><h3>Tartare de truite</h3><span class="dots"></span><span class="p">14</span></div><p>Pomme verte, raifort, aneth</p></div>
+      <div class="dish"><div class="row"><h3>Pâté en croûte maison</h3><span class="dots"></span><span class="p">15</span></div><p>Volaille, foie gras, pickles d’oignon</p></div>
+    </div>
+    <div class="menu" id="plats">
+      <div class="dish"><div class="row"><h3>Pigeonneau rôti</h3><span class="dots"></span><span class="p">32</span></div><p>Betterave, jus au sureau</p></div>
+      <div class="dish"><div class="row"><h3>Lieu jaune de ligne</h3><span class="dots"></span><span class="p">29</span></div><p>Poireaux fondants, beurre blanc au cidre</p></div>
+      <div class="dish"><div class="row"><h3>Risotto d’épeautre<span class="tagv">VÉGÉ</span></h3><span class="dots"></span><span class="p">24</span></div><p>Courge, parmesan 24 mois</p></div>
+      <div class="dish"><div class="row"><h3>Joue de bœuf confite</h3><span class="dots"></span><span class="p">27</span></div><p>Purée fumée, carottes glacées</p></div>
+    </div>
+    <div class="menu" id="desserts">
+      <div class="dish"><div class="row"><h3>Soufflé chaud</h3><span class="dots"></span><span class="p">12</span></div><p>Chartreuse, glace vanille</p></div>
+      <div class="dish"><div class="row"><h3>Tarte fine aux poires</h3><span class="dots"></span><span class="p">10</span></div><p>Frangipane, caramel beurre salé</p></div>
+      <div class="dish"><div class="row"><h3>Fromages affinés</h3><span class="dots"></span><span class="p">13</span></div><p>Sélection de la fromagerie voisine</p></div>
+    </div>
+    <div class="menu" id="vins">
+      <div class="dish"><div class="row"><h3>Beaujolais, Morgon</h3><span class="dots"></span><span class="p">7 / 38</span></div><p>Rouge · gamay · le verre / la bouteille</p></div>
+      <div class="dish"><div class="row"><h3>Saint-Joseph blanc</h3><span class="dots"></span><span class="p">9 / 46</span></div><p>Blanc · marsanne, roussanne</p></div>
+      <div class="dish"><div class="row"><h3>Bugey Cerdon</h3><span class="dots"></span><span class="p">8 / 34</span></div><p>Pétillant rosé · méthode ancestrale</p></div>
+    </div>
+    <p class="note">Menu déjeuner entrée + plat ou plat + dessert : 26 € · Prix nets en euros</p>
+  </div></section>
+
+  <section id="avis"><div class="wrap">
+    <div class="title reveal"><div class="eyebrow">Ils en parlent</div><h2>Avis</h2></div>
+    <div class="quotes reveal">
+      <div><blockquote>« La meilleure joue de bœuf de la presqu’île, et un service d’une gentillesse rare. »</blockquote><cite>Guide des bistrots</cite></div>
+      <div><blockquote>« Une ardoise courte, des produits magnifiques, des prix honnêtes. On y retourne. »</blockquote><cite>Thomas · Google</cite></div>
+      <div><blockquote>« Le soufflé à la Chartreuse vaut à lui seul le déplacement. »</blockquote><cite>Camille · TheFork</cite></div>
+    </div>
+  </div></section>
+
+  <section id="reserver" class="band"><div class="wrap resa">
+    <div class="reveal">
+      <div class="eyebrow">Réservation</div>
+      <h2>Réservez votre table</h2>
+      <p>Confirmation immédiate par SMS. Au-delà de 8 personnes, appelez-nous au 04 78 00 00 00.</p>
+      <div class="hours"><div><span>Mardi – Vendredi</span><span>12 h – 14 h 30 · 19 h – 22 h 30</span></div><div><span>Samedi</span><span>19 h – 23 h</span></div><div><span>Dimanche – Lundi</span><span>Fermé</span></div></div>
+    </div>
+    <form id="form" class="reveal" novalidate>
+      <label>Date<input type="date" name="date" id="date" required></label>
+      <label>Service<select name="heure" id="heure" required></select></label>
+      <label>Couverts<div class="stepper"><button type="button" data-d="-1" aria-label="Moins">−</button><output id="guests">2</output><button type="button" data-d="1" aria-label="Plus">+</button></div></label>
+      <label>Téléphone<input type="tel" name="tel" required placeholder="06 12 34 56 78"></label>
+      <label class="full">Nom<input name="nom" required placeholder="Votre nom"></label>
+      <button class="btn solid full">Confirmer la réservation</button>
+      <p class="ok" id="ok"></p>
+    </form>
+  </div></section>
+
+  <footer><div class="wrap"><div class="brand">Le Comptoir des Halles</div><p>14 rue des Halles, 69002 Lyon · 04 78 00 00 00</p><p style="margin-top:14px">© <span id="y"></span> · Site de démonstration — établissement fictif</p></div></footer>
+
+<script>
+  const header = document.getElementById('top')
+  const onScroll = () => header.classList.toggle('scrolled', scrollY > 40)
+  addEventListener('scroll', onScroll); onScroll()
+  const nav = document.getElementById('nav')
+  document.getElementById('burger').addEventListener('click', () => nav.classList.toggle('open'))
+  nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => nav.classList.remove('open')))
+  // Carte : onglets
+  document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b))
+    document.querySelectorAll('.menu').forEach((m) => m.classList.toggle('on', m.id === b.dataset.m))
+  }))
+  // Réservation : dates ouvertes (mar → sam), créneaux selon le jour
+  const date = document.getElementById('date'), heure = document.getElementById('heure')
+  const iso = (d) => d.toISOString().slice(0, 10)
+  const today = new Date(); date.min = iso(today); const max = new Date(); max.setDate(max.getDate() + 60); date.max = iso(max)
+  const slots = (day) => day === 6 ? ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30'] : ['12:00', '12:30', '13:00', '13:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+  const fill = () => {
+    const d = date.value ? new Date(date.value + 'T12:00') : null, day = d ? d.getDay() : null
+    const closed = day === 0 || day === 1
+    heure.innerHTML = !d ? '<option value="">Choisir une date</option>' : closed ? '<option value="">Fermé ce jour-là</option>' : '<option value="">Choisir…</option>' + slots(day).map((s) => `<option>${s}</option>`).join('')
+    date.style.borderColor = closed ? '#b54a4a' : ''
+  }
+  date.addEventListener('change', fill); fill()
+  let guests = 2; const out = document.getElementById('guests')
+  document.querySelectorAll('.stepper button').forEach((b) => b.addEventListener('click', () => { guests = Math.max(1, Math.min(8, guests + +b.dataset.d)); out.textContent = guests }))
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const f = e.target, bad = [...f.querySelectorAll('[required]')].filter((i) => !i.value.trim())
+    f.querySelectorAll('[required]').forEach((i) => i.style.borderColor = bad.includes(i) ? '#b54a4a' : '')
+    if (bad.length) return
+    const d = new Date(date.value + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+    const ok = document.getElementById('ok'); ok.textContent = `Merci ${f.nom.value} ! Table pour ${guests} le ${d} à ${heure.value}.`; ok.style.display = 'block'
+  })
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }), { threshold: .12 })
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el))
+  document.getElementById('y').textContent = new Date().getFullYear()
+</script>
+</body>
+</html>

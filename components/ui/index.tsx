@@ -3,9 +3,8 @@ import { Avatar, Box, Chip, Stack, Typography, type ChipProps, type SxProps } fr
 import type { ReactNode } from 'react'
 import { NEED_HEX, statusMeta } from '@/lib/shared/data'
 import type { Status } from '@/lib/shared/types'
-import { brand } from '../theme/theme'
 
-const AV = ['#8b5cf6', '#22d3ee', '#f472b6', '#34d399', '#fbbf24', '#60a5fa', '#fb923c']
+const AV = ['#1976d2', '#9c27b0', '#2e7d32', '#ed6c02', '#0288d1', '#d32f2f', '#5d4037']
 export const colorFor = (name: string) => AV[[...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % AV.length]
 
 export function UserAvatar({ name, size = 28 }: { name: string | null | undefined; size?: number }) {
@@ -33,8 +32,9 @@ export function NeedChip({ need }: { need: string }) {
   return <Chip size="small" label={need} sx={{ color: c, bgcolor: `${c}18`, border: `1px solid ${c}40` }} />
 }
 
+/** Texte mis en avant (couleur principale du thème). */
 export function GradientText({ children, sx }: { children: ReactNode; sx?: SxProps }) {
-  return <Box component="span" sx={[(t) => ({ background: brand.gradientText, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', ...t.applyStyles('light', { background: 'linear-gradient(90deg, #7c3aed 0%, #0891b2 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text' }) }), ...(Array.isArray(sx) ? sx : [sx])]}>{children}</Box>
+  return <Box component="span" sx={[{ color: 'primary.main' }, ...(Array.isArray(sx) ? sx : [sx])]}>{children}</Box>
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode }) {
@@ -63,8 +63,8 @@ export function SectionLabel({ children }: { children: ReactNode }) {
   return <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>{children}</Typography>
 }
 
-/** Petite « pilule » lumineuse façon Web3 (badges Nouveau, Bientôt…). */
+/** Petit badge (Nouveau, Bientôt…). */
 export function GlowBadge({ label, tone = 'violet' }: { label: string; tone?: 'violet' | 'green' | 'cyan' | 'gray' }) {
-  const c = { violet: brand.violet, green: '#34d399', cyan: brand.cyan, gray: '#94a3b8' }[tone]
-  return <Chip size="small" label={label} sx={{ height: 20, fontSize: '0.66rem', color: c, bgcolor: `${c}1f`, border: `1px solid ${c}55`, boxShadow: `0 0 12px -2px ${c}66` }} />
+  const color = ({ violet: 'primary', green: 'success', cyan: 'info', gray: 'default' } as const)[tone]
+  return <Chip size="small" label={label} color={color} variant="outlined" sx={{ height: 20, fontSize: '0.66rem' }} />
 }

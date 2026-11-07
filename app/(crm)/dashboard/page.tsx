@@ -22,7 +22,7 @@ function StatCard({ icon, label, value, sub, series, color = brand.violet }: { i
     <Card sx={{ height: '100%' }}>
       <CardContent sx={{ pb: '16px !important' }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
-          <Box sx={{ width: 28, height: 28, borderRadius: 2, display: 'grid', placeItems: 'center', color, bgcolor: `${color}1f`, border: `1px solid ${color}40`, '& svg': { fontSize: 16 } }}>{icon}</Box>
+          <Box sx={{ width: 28, height: 28, borderRadius: 2, display: 'grid', placeItems: 'center', color, bgcolor: `${color}1f`, '& svg': { fontSize: 16 } }}>{icon}</Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>{label}</Typography>
         </Stack>
         <Stack direction="row" sx={{ mt: 1.5, alignItems: 'flex-end', justifyContent: 'space-between', gap: 1 }}>
@@ -158,9 +158,8 @@ export default function DashboardPage() {
           </Card>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
-            <Box sx={{ position: 'absolute', inset: 'auto -40px -60px auto', width: 220, height: 220, borderRadius: '50%', background: brand.gradient, filter: 'blur(60px)', opacity: 0.35 }} />
-            <CardContent sx={{ position: 'relative' }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
               <Typography variant="h6">Mes Maquettes</Typography>
               <Typography variant="caption" color="text.secondary">Présentations envoyées aux prospects</Typography>
               <Stack spacing={1.5} sx={{ mt: 2 }}>

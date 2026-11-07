@@ -48,11 +48,11 @@ export function quoteTotals(q: Pick<Quote, 'lines' | 'discount' | 'vatRate'>) {
 }
 
 export const QUOTE_STATUS: Record<QuoteStatus, { label: string; hex: string }> = {
-  brouillon: { label: 'Brouillon', hex: '#94a3b8' },
-  envoye: { label: 'Envoyé', hex: '#a78bfa' },
-  accepte: { label: 'Accepté', hex: '#34d399' },
-  refuse: { label: 'Refusé', hex: '#f87171' },
-  annule: { label: 'Annulé', hex: '#64748b' },
+  brouillon: { label: 'Brouillon', hex: '#757575' },
+  envoye: { label: 'Envoyé', hex: '#1976d2' },
+  accepte: { label: 'Accepté', hex: '#2e7d32' },
+  refuse: { label: 'Refusé', hex: '#d32f2f' },
+  annule: { label: 'Annulé', hex: '#9e9e9e' },
 }
 
 /** Valeur one-shot d'une affaire : devis s'il existe, sinon budget estimé. */

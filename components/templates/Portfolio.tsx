@@ -25,7 +25,7 @@ export function AgencyMark({ agency }: { agency: AgencyInfo }) {
     <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
       {agency.logoFile
         ? <Box component="img" src={imgUrl(agency.logoFile)} alt={agency.name} sx={{ height: 38, width: 'auto', objectFit: 'contain' }} />
-        : <Box sx={{ width: 38, height: 38, borderRadius: 2.5, display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg,#8b5cf6,#22d3ee)' }}>
+        : <Box sx={{ width: 38, height: 38, borderRadius: 2.5, display: 'grid', placeItems: 'center', bgcolor: 'primary.main' }}>
             <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M7 24 L16 7 L25 24" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </Box>}
       <Box>
@@ -50,7 +50,7 @@ function PortfolioInner({ agency, eyebrow, title, message, templates, selectedId
   const open = idx >= 0 ? templates[idx] : null
   return (
     <Box sx={{ minHeight: '100%', bgcolor: 'background.default', color: 'text.primary' }}>
-      <Box sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(12px)', borderBottom: '1px solid', borderColor: 'rgba(15,23,42,0.08)' }}>
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: '#fff', borderBottom: '1px solid', borderColor: 'rgba(15,23,42,0.08)' }}>
         <Container maxWidth="lg" sx={{ py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
           <AgencyMark agency={agency} />
           <Stack direction="row" spacing={1}>

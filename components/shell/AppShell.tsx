@@ -1,16 +1,15 @@
 'use client'
-import { KeyboardArrowRightRounded, LogoutRounded, ManageAccountsOutlined, MenuRounded, MoreVertRounded, NotificationsNoneRounded, SearchRounded } from '@mui/icons-material'
+import { KeyboardArrowRightRounded, LogoutRounded, ManageAccountsOutlined, MenuRounded, MoreVertRounded, SearchRounded } from '@mui/icons-material'
 import {
-  AppBar, Autocomplete, Badge, Box, Breadcrumbs, Divider, Drawer, IconButton, InputAdornment, List, ListItemButton, ListItemIcon, ListItemText,
-  Menu, MenuItem, Stack, TextField, Toolbar, Tooltip, Typography,
+  AppBar, Autocomplete, Box, Breadcrumbs, Divider, Drawer, IconButton, InputAdornment, List, ListItemButton, ListItemIcon, ListItemText,
+  Menu, MenuItem, Stack, TextField, Toolbar, Typography,
 } from '@mui/material'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { useAuth } from '@/lib/client/auth'
 import { useStore } from '@/lib/client/store'
 import { ROLE_LABEL } from '@/lib/shared/types'
-import { followState } from '@/lib/shared/utils'
 import { GlowBadge, UserAvatar } from '../ui'
 import { AccountDialog } from './AccountDialog'
 import { ModeToggle } from './AuthScreens'
@@ -26,7 +25,6 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const auth = useAuth()
   const [menu, setMenu] = useState<HTMLElement | null>(null)
   const [account, setAccount] = useState(false)
-  const follow = store.prospects.filter((p) => ['overdue', 'today'].includes(followState(p))).length
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -42,19 +40,11 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 const active = path === item.href || path.startsWith(item.href + '/')
                 return (
                   <ListItemButton key={item.href} component={Link} href={item.href} onClick={onNavigate} selected={active}
-                    sx={{
-                      mb: 0.25, py: 0.85, position: 'relative',
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(139,92,246,0.14)',
-                        '&:hover': { bgcolor: 'rgba(139,92,246,0.2)' },
-                        '&::before': { content: '""', position: 'absolute', left: -12, top: 8, bottom: 8, width: 3, borderRadius: 3, background: 'linear-gradient(180deg,#8b5cf6,#22d3ee)', boxShadow: '0 0 12px #8b5cf6' },
-                      },
-                    }}>
-                    <ListItemIcon sx={{ minWidth: 34, color: item.accent ?? (active ? 'primary.light' : 'text.secondary') }}><item.icon fontSize="small" /></ListItemIcon>
+                    sx={{ mb: 0.25, py: 0.85, borderRadius: 1 }}>
+                    <ListItemIcon sx={{ minWidth: 34, color: active ? 'primary.main' : 'text.secondary' }}><item.icon fontSize="small" /></ListItemIcon>
                     <ListItemText primary={item.label} slotProps={{ primary: { sx: { fontSize: '0.88rem', fontWeight: active || item.badge === 'new' ? 600 : 500 } } }} />
                     {item.badge === 'new' && <GlowBadge label="Nouveau" tone="green" />}
                     {item.badge === 'soon' && <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>Bientôt</Typography>}
-                    {item.href === '/taches' && follow > 0 && <Badge badgeContent={follow} color="warning" sx={{ mr: 1 }} />}
                   </ListItemButton>
                 )
               })}
@@ -105,9 +95,6 @@ function QuickSearch() {
 
 function Header() {
   const path = usePathname()
-  const router = useRouter()
-  const store = useStore()
-  const follow = store.prospects.filter((p) => ['overdue', 'today'].includes(followState(p))).length
   return (
     <Stack direction="row" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'space-between', mb: 3, gap: 2 }}>
       <Breadcrumbs separator={<KeyboardArrowRightRounded fontSize="small" />} sx={{ '& .MuiBreadcrumbs-separator': { color: 'text.disabled' } }}>
@@ -116,11 +103,6 @@ function Header() {
       </Breadcrumbs>
       <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
         <QuickSearch />
-        <Tooltip title={follow ? `${follow} relance(s) à faire` : 'Aucune relance en attente'}>
-          <IconButton size="small" onClick={() => router.push('/taches')} sx={{ border: 1, borderColor: 'divider' }}>
-            <Badge color="warning" variant={follow ? 'dot' : 'standard'} invisible={!follow}><NotificationsNoneRounded fontSize="small" /></Badge>
-          </IconButton>
-        </Tooltip>
         <ModeToggle />
       </Stack>
     </Stack>
@@ -139,7 +121,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <NavContent onNavigate={() => setOpen(false)} />
       </Drawer>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <AppBar position="sticky" color="transparent" sx={{ display: { md: 'none' }, backdropFilter: 'blur(14px)', borderBottom: 1, borderColor: 'divider', bgcolor: 'background.default' }}>
+        <AppBar position="sticky" color="transparent" sx={{ display: { md: 'none' }, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
           <Toolbar sx={{ gap: 1 }}>
             <IconButton edge="start" onClick={() => setOpen(true)} aria-label="Ouvrir le menu"><MenuRounded /></IconButton>
             <Typography variant="h6" sx={{ flex: 1 }} noWrap>{titleFor(path)}</Typography>

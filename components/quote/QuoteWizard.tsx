@@ -9,7 +9,6 @@ import {
 } from '@mui/material'
 import { useMemo, useState, type ReactNode } from 'react'
 import { useLeadDrawer } from '@/components/shell/LeadDrawerContext'
-import { brand } from '@/components/theme/theme'
 import { useStore } from '@/lib/client/store'
 import type { Pack, PackCategory, Prospect } from '@/lib/shared/types'
 import { QuoteDialog } from './QuoteDialog'
@@ -88,7 +87,7 @@ export function QuoteWizard() {
     <Grid container spacing={3}>
       <Grid size={{ xs: 12, lg: 8 }}>
         <Card sx={{ overflow: 'hidden' }}>
-          <LinearProgress variant="determinate" value={((step + 1) / STEPS.length) * 100} sx={{ height: 3, bgcolor: 'transparent', '& .MuiLinearProgress-bar': { background: brand.gradient } }} />
+          <LinearProgress variant="determinate" value={((step + 1) / STEPS.length) * 100} sx={{ height: 3 }} />
           <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5 }}>
             {compact ? (
               <Typography variant="overline" color="text.secondary">Étape {step + 1} / {STEPS.length} · {cur.label}</Typography>
@@ -112,7 +111,7 @@ export function QuoteWizard() {
 
           <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, minHeight: 320 }}>
             <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 0.5 }}>
-              <Box sx={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: 2, color: '#fff', background: brand.gradient, '& svg': { fontSize: 20 } }}>{cur.icon}</Box>
+              <Box sx={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: 1, color: '#fff', bgcolor: 'primary.main', '& svg': { fontSize: 20 } }}>{cur.icon}</Box>
               <Typography variant="h5">{cur.title}</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>{cur.hint}</Typography>
@@ -239,7 +238,7 @@ function PackChoices({ packs, sel, pick, onToggle }: { packs: Pack[]; sel: strin
         const on = sel.includes(k.id)
         return (
           <Grid key={k.id} size={{ xs: 12, sm: 6 }}>
-            <Card sx={{ height: '100%', borderColor: on ? 'primary.main' : undefined, boxShadow: on ? '0 0 0 1px #8b5cf6, 0 0 28px -8px rgba(139,92,246,0.8)' : undefined, transition: 'box-shadow .15s, border-color .15s' }}>
+            <Card sx={{ height: '100%', borderColor: on ? 'primary.main' : undefined, bgcolor: on ? 'action.selected' : undefined, transition: 'box-shadow .15s, border-color .15s' }}>
               <CardActionArea onClick={() => onToggle(k)} aria-pressed={on} sx={{ height: '100%', p: 2, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                 <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <Typography sx={{ fontWeight: 600 }}>{k.name}</Typography>

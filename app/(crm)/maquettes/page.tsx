@@ -11,7 +11,7 @@ import {
 import { useMemo, useRef, useState } from 'react'
 import { useLeadDrawer } from '@/components/shell/LeadDrawerContext'
 import { usePresenter } from '@/components/templates/PresenterContext'
-import { EmptyState, GlowBadge, PageHeader, SectionLabel } from '@/components/ui'
+import { EmptyState, PageHeader, SectionLabel } from '@/components/ui'
 import { imgUrl, uploadScreenshot } from '@/lib/client/images'
 import { useStore } from '@/lib/client/store'
 import { safeHref, suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
@@ -58,7 +58,7 @@ export default function MaquettesPage() {
 
   return (
     <>
-      <PageHeader title={<Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}><span>Mes Maquettes</span><GlowBadge label="Nouveau" tone="green" /></Stack>}
+      <PageHeader title={<Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}><span>Mes Maquettes</span></Stack>}
         subtitle="Votre catalogue de modèles de sites à montrer aux prospects."
         actions={<>
           <Button variant="outlined" startIcon={<SlideshowRounded />} disabled={!list.some((t) => t.status === 'active')} onClick={() => presenter.present({ templateIds: list.filter((t) => t.status === 'active').map((t) => t.id) })}>Présentation client</Button>
@@ -94,11 +94,11 @@ export default function MaquettesPage() {
             const chosen = store.templateClientSelections.filter((s) => s.templateId === t.id).length
             return (
               <Grid key={t.id} size={{ xs: 12, sm: 6, xl: 4 }}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', opacity: t.status === 'archived' ? 0.6 : 1, transition: '0.2s', '&:hover': { borderColor: 'primary.main', boxShadow: '0 0 0 1px rgba(139,92,246,0.4), 0 20px 40px -20px rgba(139,92,246,0.6)' } }}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', opacity: t.status === 'archived' ? 0.6 : 1, transition: '0.2s', '&:hover': { borderColor: 'primary.main' } }}>
                   <CardActionArea onClick={() => setEditing(t)} sx={{ position: 'relative', aspectRatio: '16 / 10', bgcolor: 'action.hover', overflow: 'hidden' }}>
                     {cover ? <Box component="img" src={imgUrl(cover.thumb)} alt={t.name} loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                       : <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', color: 'text.disabled' }}><AddPhotoAlternateOutlined /></Box>}
-                    <Chip size="small" label={store.categoryName(t.categoryId)} sx={{ position: 'absolute', top: 10, left: 10, bgcolor: 'rgba(7,6,14,0.75)', color: '#fff', backdropFilter: 'blur(6px)' }} />
+                    <Chip size="small" label={store.categoryName(t.categoryId)} sx={{ position: 'absolute', top: 10, left: 10, bgcolor: 'rgba(0,0,0,0.6)', color: '#fff' }} />
                     {t.status === 'archived' && <Chip size="small" label="Archivée" sx={{ position: 'absolute', top: 10, right: 10 }} />}
                     {chosen > 0 && <Chip size="small" color="success" icon={<StarRounded />} label={`${chosen} choix client`} sx={{ position: 'absolute', bottom: 10, right: 10 }} />}
                   </CardActionArea>

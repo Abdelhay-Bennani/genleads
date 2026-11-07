@@ -6,7 +6,7 @@ import { theme } from './theme'
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider theme={theme} defaultMode="dark" modeStorageKey="agenceflow-mode">
+    <ThemeProvider theme={theme} defaultMode="light" modeStorageKey="agenceflow-mode-v2">
       <CssBaseline enableColorScheme />
       {children}
     </ThemeProvider>

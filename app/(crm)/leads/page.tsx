@@ -156,10 +156,10 @@ function Kanban({ list }: { list: Prospect[] }) {
           <Box key={s.id}
             onDragOver={(e) => { e.preventDefault(); setOver(s.id) }} onDragLeave={() => setOver(null)}
             onDrop={(e) => { e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); if (id) store.updateProspect(id, { status: s.id }); setOver(null) }}
-            sx={{ width: 280, flexShrink: 0, borderRadius: 3, p: 1.25, bgcolor: 'action.hover', border: 1, borderColor: over === s.id ? s.hex : 'divider', boxShadow: over === s.id ? `0 0 24px -6px ${s.hex}` : 'none', transition: '0.15s' }}>
+            sx={{ width: 280, flexShrink: 0, borderRadius: 3, p: 1.25, bgcolor: 'action.hover', border: 1, borderColor: over === s.id ? s.hex : 'divider', transition: '0.15s' }}>
             <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', px: 0.5, pb: 1.25 }}>
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: s.hex, boxShadow: `0 0 10px ${s.hex}` }} />
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: s.hex }} />
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>{s.label}</Typography>
                 <Chip size="small" label={items.length} />
               </Stack>

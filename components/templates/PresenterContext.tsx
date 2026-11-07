@@ -141,7 +141,7 @@ function ShareDialog({ prospectId: initialProspect, templateIds: initialIds, onC
                   const cover = store.coverOf(t)
                   return (
                     <Grid key={t.id} size={{ xs: 6, sm: 4 }}>
-                      <Card sx={{ borderColor: on ? 'primary.main' : undefined, boxShadow: on ? '0 0 0 1px #8b5cf6, 0 0 24px -6px rgba(139,92,246,0.7)' : undefined }}>
+                      <Card sx={{ borderColor: on ? 'primary.main' : undefined, bgcolor: on ? 'action.selected' : undefined }}>
                         <CardActionArea onClick={() => toggle(t.id)}>
                           <Box sx={{ position: 'relative', aspectRatio: '16 / 10', bgcolor: 'action.hover' }}>
                             {cover && <Box component="img" src={imgUrl(cover.thumb)} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />}

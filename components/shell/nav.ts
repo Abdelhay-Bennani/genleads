@@ -1,5 +1,5 @@
 import {
-  AccountBalanceWalletOutlined, AssignmentTurnedInOutlined, BadgeOutlined, DashboardOutlined, DesktopWindowsOutlined, DescriptionOutlined,
+  AccountBalanceWalletOutlined, BadgeOutlined, DashboardOutlined, DesktopWindowsOutlined, DescriptionOutlined,
   FolderOpenOutlined, InsightsOutlined, Inventory2Outlined, PeopleAltOutlined, ReceiptLongOutlined, SettingsOutlined,
 } from '@mui/icons-material'
 import type { SvgIconComponent } from '@mui/icons-material'
@@ -15,7 +15,6 @@ export const NAV: NavSection[] = [
       { href: '/dashboard', label: 'Dashboard', icon: DashboardOutlined },
       { href: '/leads', label: 'Leads CRM', icon: PeopleAltOutlined },
       { href: '/clients', label: 'Clients', icon: BadgeOutlined },
-      { href: '/taches', label: 'Tâches & Relances', icon: AssignmentTurnedInOutlined },
     ],
   },
   {
@@ -30,7 +29,7 @@ export const NAV: NavSection[] = [
   {
     title: "Ressources de l'agence",
     items: [
-      { href: '/maquettes', label: 'Mes Maquettes', icon: DesktopWindowsOutlined, badge: 'new', accent: '#34d399' },
+      { href: '/maquettes', label: 'Mes Maquettes', icon: DesktopWindowsOutlined },
       { href: '/presentations', label: 'Présentations clients', icon: FolderOpenOutlined },
     ],
   },

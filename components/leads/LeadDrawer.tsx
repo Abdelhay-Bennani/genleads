@@ -47,7 +47,7 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
       <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.25, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>
           <InputBase value={p.company} onChange={(e) => patch({ company: e.target.value })} placeholder="Nom de l'entreprise" autoFocus={isNew} fullWidth
-            sx={{ fontFamily: '"Space Grotesk Variable", sans-serif', fontSize: 24, fontWeight: 600 }} />
+            sx={{ fontSize: 24, fontWeight: 600 }} />
           <IconButton onClick={onClose} aria-label="Fermer"><CloseRounded /></IconButton>
         </Stack>
         <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 1 }}>
@@ -276,7 +276,7 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
               {list.map((k) => {
                 const on = p.packIds.includes(k.id)
                 return (
-                  <Card key={k.id} sx={{ borderColor: on ? 'primary.main' : undefined, boxShadow: on ? '0 0 0 1px rgba(139,92,246,0.5), 0 0 24px -8px rgba(139,92,246,0.7)' : undefined }}>
+                  <Card key={k.id} sx={{ borderColor: on ? 'primary.main' : undefined, bgcolor: on ? 'action.selected' : undefined }}>
                     <CardActionArea onClick={() => toggle(k.id)} sx={{ p: 1.5, display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                       <Checkbox checked={on} size="small" sx={{ p: 0, mt: 0.25 }} tabIndex={-1} />
                       <Box sx={{ flex: 1, minWidth: 0 }}>

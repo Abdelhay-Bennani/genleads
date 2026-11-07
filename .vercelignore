@@ -1,15 +1,17 @@
-# Fichiers locaux à ne pas envoyer sur Vercel
-node_modules
-.next
-.env
-.env*.local
-data
-lancer.log
-*.bat
+# Fichiers locaux à ne pas envoyer sur Vercel (le « / » limite chaque règle à la racine du projet)
+/node_modules
+/.next
+/.env
+/.env*.local
+/data
+/lancer.log
+/vercel-url.txt
+/*.bat
 # ancienne version (Vite) éventuellement présente dans le dossier
-src
-server
-index.html
-vite.config.ts
-tailwind.config.js
-AgenceFlow-CRM.html
+/src
+/server
+/index.html
+/vite.config.ts
+/tailwind.config.js
+/AgenceFlow-CRM.html
+/vercel-database-url.txt

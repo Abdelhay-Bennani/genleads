@@ -1,6 +1,20 @@
+# dépendances / builds
 node_modules
 .next
-.env*.local
 next-env.d.ts
 *.tsbuildinfo
+# secrets et données locales — ne jamais publier
+.env
+.env*
 data
+.vercel
+lancer.log
+vercel-url.txt
+# ancienne version (Vite) encore présente dans le dossier local
+/src
+/server
+/index.html
+/vite.config.ts
+/tailwind.config.js
+/AgenceFlow-CRM.html
+vercel-database-url.txt

@@ -21,7 +21,7 @@ git(remotes.split('\n').includes('origin') ? ['remote', 'set-url', 'origin', REM
 git(['add', '-A'])
 // Garde-fou : aucun secret ni donnée locale ne doit partir sur GitHub
 const staged = out(['diff', '--cached', '--name-only']).split('\n').concat(out(['ls-files']).split('\n')).filter(Boolean)
-const leak = staged.find((f) => /(^|\/)\.env|^data\/|^\.vercel\/|lancer\.log$/.test(f))
+const leak = staged.find((f) => /(^|\/)\.env|^data\/|^\.vercel\/|lancer\.log$|vercel-database-url/.test(f))
 if (leak) { git(['reset']); fail(`Fichier sensible détecté (${leak}) : envoi annulé.`) }
 
 const msg = `AgenceFlow CRM v${JSON.parse(fs.readFileSync('package.json', 'utf8')).version} — Next.js, MUI, PostgreSQL, Mes Maquettes

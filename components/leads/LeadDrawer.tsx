@@ -1,7 +1,7 @@
 'use client'
 import {
   AlarmRounded, CallRounded, CheckRounded, ContentCopyRounded, DeleteOutlineRounded, DescriptionOutlined, DesktopWindowsOutlined, EmailOutlined,
-  EventRounded, LanguageRounded, LinkRounded, NotesRounded, OpenInNewRounded, PlaceOutlined, SendRounded, SlideshowRounded, SmsOutlined, StarRounded,
+  EventRounded, LanguageRounded, LinkRounded, NotesRounded, OpenInNewRounded, PictureAsPdfOutlined, PlaceOutlined, SendRounded, SlideshowRounded, SmsOutlined, StarRounded,
 } from '@mui/icons-material'
 import CloseRounded from '@mui/icons-material/CloseRounded'
 import {
@@ -15,6 +15,8 @@ import { suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
 import { NEEDS, PACK_CATEGORIES, SECTORS, STATUSES } from '@/lib/shared/data'
 import type { InteractionType, Prospect } from '@/lib/shared/types'
 import { addDays, ensureHttp, eur, fmtDate, fmtDateTime, followState, mapsUrl, quote, telHref, todayISO, uid } from '@/lib/shared/utils'
+import { QuoteDialog } from '../quote/QuoteDialog'
+import { QuoteList } from '../quote/QuoteList'
 import { PresentationRow } from '../templates/PresentationRow'
 import { usePresenter } from '../templates/PresenterContext'
 import { SectionLabel, UserAvatar } from '../ui'
@@ -219,6 +221,8 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
   const packs = store.packs.filter((k) => k.active || p.packIds.includes(k.id))
   const q = quote(p, store.packs)
   const [copied, setCopied] = useState(false)
+  const [issuing, setIssuing] = useState(false)
+  const quotes = store.quotes.filter((x) => x.leadId === p.id)
   const toggle = (id: string) => patch({ packIds: p.packIds.includes(id) ? p.packIds.filter((x) => x !== id) : [...p.packIds, id] })
   const tpl = p.templateId ? store.templates.find((t) => t.id === p.templateId) ?? null : null
   const suggested = tpl ? suggestPacks(tpl, p, store.packs).filter((id) => !p.packIds.includes(id)) : []
@@ -307,6 +311,15 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
           {p.status !== 'devis' && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>Passe le statut à « Devis envoyé », l'ajoute au journal et programme une relance à J+3.</Typography>}
         </Box>
       ) : <Alert severity="info" variant="outlined">Cochez un ou plusieurs packs pour chiffrer et générer la proposition.</Alert>}
+
+      <Box>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <SectionLabel>Devis PDF émis</SectionLabel>
+          <Button size="small" variant="contained" startIcon={<PictureAsPdfOutlined />} disabled={isNew || !q.sel.length} onClick={() => setIssuing(true)}>Émettre le devis PDF</Button>
+        </Stack>
+        {quotes.length ? <QuoteList quotes={quotes} /> : <Typography variant="caption" color="text.secondary">{isNew ? 'Créez d’abord le prospect.' : 'Aucun devis émis pour ce lead.'}</Typography>}
+      </Box>
+      {issuing && <QuoteDialog lead={p} packIds={q.sel.map((k) => k.id)} discount={p.discount || 0} onClose={() => setIssuing(false)} />}
     </Stack>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 import {
   ArrowBackRounded, ArrowForwardRounded, BusinessCenterOutlined, CheckCircleRounded, CheckRounded, ContentCopyRounded, LanguageRounded,
-  PersonSearchOutlined, RadioButtonUncheckedRounded, RestartAltRounded, ShieldOutlined, TrendingUpRounded,
+  PersonSearchOutlined, PictureAsPdfOutlined, RadioButtonUncheckedRounded, RestartAltRounded, ShieldOutlined, TrendingUpRounded,
 } from '@mui/icons-material'
 import {
   Alert, Autocomplete, Box, Button, Card, CardActionArea, Divider, Grid, LinearProgress, Stack, Step, StepButton, Stepper, TextField,
@@ -12,6 +12,7 @@ import { useLeadDrawer } from '@/components/shell/LeadDrawerContext'
 import { brand } from '@/components/theme/theme'
 import { useStore } from '@/lib/client/store'
 import type { Pack, PackCategory, Prospect } from '@/lib/shared/types'
+import { QuoteDialog } from './QuoteDialog'
 import { eur, isClosed } from '@/lib/shared/utils'
 
 type Mode = 'lead' | 'libre'
@@ -37,6 +38,7 @@ export function QuoteWizard() {
   const [discount, setDiscount] = useState(0)
   const [copied, setCopied] = useState(false)
   const [applied, setApplied] = useState(false)
+  const [pdf, setPdf] = useState(false)
 
   const leads = useMemo(() => store.prospects.filter((p) => !isClosed(p) || p.id === leadId), [store.prospects, leadId])
   const lead = leadId ? store.prospects.find((p) => p.id === leadId) ?? null : null
@@ -167,7 +169,11 @@ export function QuoteWizard() {
                       {applied ? `Appliqué à ${lead.company}` : `Appliquer à ${lead.company}`}
                     </Button>
                   )}
-                  {lead && applied && <Button variant="outlined" onClick={() => drawer.open(lead.id, 'devis')}>Ouvrir la fiche (proposition, envoi)</Button>}
+                  <Button variant={lead ? 'outlined' : 'contained'} disabled={!chosen.length} startIcon={<PictureAsPdfOutlined />}
+                    onClick={() => { if (lead && !applied) apply(); setPdf(true) }}>
+                    {lead ? 'Émettre le devis PDF' : 'Télécharger en PDF'}
+                  </Button>
+                  {lead && applied && <Button variant="outlined" onClick={() => drawer.open(lead.id, 'devis')}>Ouvrir la fiche</Button>}
                   <Button variant="outlined" disabled={!chosen.length} startIcon={copied ? <CheckRounded /> : <ContentCopyRounded />}
                     onClick={async () => { try { await navigator.clipboard.writeText(summary); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { store.notify('Copie impossible', false) } }}>
                     {copied ? 'Copié' : 'Copier le récapitulatif'}
@@ -175,6 +181,7 @@ export function QuoteWizard() {
                   <Button startIcon={<RestartAltRounded />} onClick={reset}>Nouvelle simulation</Button>
                 </Stack>
                 {lead && lead.packIds.length > 0 && !applied && <Typography variant="caption" color="text.secondary">Appliquer remplace le devis actuel de la fiche par cette sélection.</Typography>}
+                {pdf && <QuoteDialog lead={lead} packIds={sel} discount={discount} onClose={() => setPdf(false)} />}
               </Stack>
             )}
           </Box>

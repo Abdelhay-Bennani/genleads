@@ -3,7 +3,7 @@ import crypto from 'node:crypto'
 import type postgres from 'postgres'
 import { SITE_TYPES } from '../shared/data'
 import type {
-  AgencySettings, ClientSelection, Interaction, KeywordQuery, Pack, Presentation, PresentationItem, Prospect, PublicUser,
+  AgencySettings, ClientSelection, Interaction, KeywordQuery, Pack, Presentation, PresentationItem, Prospect, PublicUser, Quote,
   TemplateCategory, TemplateImage, WebsiteTemplate,
 } from '../shared/types'
 import { DEFAULT_SETTINGS } from './seed'
@@ -72,6 +72,13 @@ const toSelection = (r: Row): ClientSelection => ({
   prospectId: (r.lead_id as string) ?? null, clientName: r.client_name as string, message: r.message as string, createdAt: iso(r.created_at)!,
 })
 
+export const toQuote = (r: Row): Quote => ({
+  id: r.id as string, number: r.number as string, leadId: (r.lead_id as string) ?? null, status: r.status as Quote["status"],
+  client: r.client as Quote["client"], lines: r.lines as Quote["lines"], discount: Number(r.discount ?? 0), vatRate: Number(r.vat_rate ?? 0),
+  validUntil: r.valid_until as string, paymentTerms: r.payment_terms as string, notes: r.notes as string, createdBy: r.created_by as string,
+  createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
+})
+
 /* ------------------------------------------------------------ lecture */
 
 export async function getSettings(sql: Sql): Promise<AgencySettings> {
@@ -88,7 +95,7 @@ export async function loadLeads(sql: Sql, ids?: string[]): Promise<Prospect[]> {
 }
 
 export async function loadAll(sql: Sql) {
-  const [prospects, packs, keywords, users, cats, templates, images, pres, items, sels, settings] = await Promise.all([
+  const [prospects, packs, keywords, users, cats, templates, images, pres, items, sels, settings, quotes] = await Promise.all([
     loadLeads(sql),
     sql`select * from packs order by position, name`,
     sql`select * from prospecting_queries order by position`,
@@ -100,6 +107,7 @@ export async function loadAll(sql: Sql) {
     sql`select * from template_presentation_items order by presentation_id, position`,
     sql`select * from template_client_selections order by created_at desc`,
     getSettings(sql),
+    sql`select * from quotes order by year desc, seq desc`,
   ])
   return {
     prospects,
@@ -114,6 +122,7 @@ export async function loadAll(sql: Sql) {
     templateClientSelections: sels.map(toSelection),
     settings,
     siteTypes: SITE_TYPES,
+    quotes: quotes.map(toQuote),
   }
 }
 

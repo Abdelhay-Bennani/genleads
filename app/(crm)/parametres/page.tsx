@@ -82,9 +82,26 @@ function Agency() {
             </Grid>
           </Grid>
         </Grid>
+        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6">Mentions légales & devis</Typography>
+        <Typography variant="body2" color="text.secondary">Imprimées sur les devis PDF. Un devis sans ces mentions n’est pas conforme.</Typography>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid size={{ xs: 12, sm: 6 }}><TextField label="Raison sociale" value={s.legalName} onChange={(e) => setS({ ...s, legalName: e.target.value })} placeholder={s.agencyName} /></Grid>
+          <Grid size={{ xs: 12, sm: 6 }}><TextField label="Adresse" value={s.address} onChange={(e) => setS({ ...s, address: e.target.value })} /></Grid>
+          <Grid size={{ xs: 4, sm: 2 }}><TextField label="Code postal" value={s.postalCode} onChange={(e) => setS({ ...s, postalCode: e.target.value })} /></Grid>
+          <Grid size={{ xs: 8, sm: 4 }}><TextField label="Ville" value={s.city} onChange={(e) => setS({ ...s, city: e.target.value })} /></Grid>
+          <Grid size={{ xs: 12, sm: 3 }}><TextField label="SIRET" value={s.siret} onChange={(e) => setS({ ...s, siret: e.target.value })} /></Grid>
+          <Grid size={{ xs: 12, sm: 3 }}><TextField label="N° TVA intracom." value={s.vatNumber} onChange={(e) => setS({ ...s, vatNumber: e.target.value })} /></Grid>
+          <Grid size={{ xs: 6, sm: 3 }}><TextField label="Taux de TVA (%)" type="number" value={s.vatRate} onChange={(e) => setS({ ...s, vatRate: Number(e.target.value) || 0 })} helperText={s.vatRate === 0 ? 'Franchise : « TVA non applicable, art. 293 B du CGI »' : undefined} /></Grid>
+          <Grid size={{ xs: 6, sm: 3 }}><TextField label="Validité des devis (jours)" type="number" value={s.quoteValidityDays} onChange={(e) => setS({ ...s, quoteValidityDays: Number(e.target.value) || 30 })} /></Grid>
+          <Grid size={{ xs: 12, sm: 4 }}><TextField label="IBAN" value={s.iban} onChange={(e) => setS({ ...s, iban: e.target.value })} /></Grid>
+          <Grid size={{ xs: 12, sm: 2 }}><TextField label="BIC" value={s.bic} onChange={(e) => setS({ ...s, bic: e.target.value })} /></Grid>
+          <Grid size={{ xs: 12, sm: 6 }}><TextField label="Conditions de paiement" multiline minRows={2} value={s.paymentTerms} onChange={(e) => setS({ ...s, paymentTerms: e.target.value })} /></Grid>
+          <Grid size={12}><TextField label="Mentions par défaut en bas du devis" multiline minRows={2} value={s.quoteNotes} onChange={(e) => setS({ ...s, quoteNotes: e.target.value })} /></Grid>
+        </Grid>
         {err && <Alert severity="error" sx={{ mt: 2 }}>{err}</Alert>}
         <Stack direction="row" sx={{ justifyContent: 'flex-end', mt: 3 }}>
-          <Button variant="contained" disabled={busy || uploading} onClick={async () => { setBusy(true); try { await store.saveSettings(s); store.notify("Identité de l'agence enregistrée") } catch (e) { setErr((e as Error).message) } finally { setBusy(false) } }}>Enregistrer</Button>
+          <Button variant="contained" disabled={busy || uploading} onClick={async () => { setBusy(true); try { await store.saveSettings(s); store.notify("Paramètres de l'agence enregistrés") } catch (e) { setErr((e as Error).message) } finally { setBusy(false) } }}>Enregistrer</Button>
         </Stack>
       </CardContent>
     </Card>

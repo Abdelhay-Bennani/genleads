@@ -168,7 +168,31 @@ create table if not exists template_client_selections (
 );
 
 create table if not exists settings (key text primary key, value jsonb not null);
+
+create table if not exists quotes (
+  id text primary key,
+  number text not null unique,
+  year int not null,
+  seq int not null,
+  lead_id text references leads(id) on delete set null,
+  status text not null default 'brouillon' check (status in ('brouillon', 'envoye', 'accepte', 'refuse', 'annule')),
+  client jsonb not null,
+  lines jsonb not null,
+  discount numeric not null default 0,
+  vat_rate numeric not null default 20,
+  valid_until text not null,
+  payment_terms text not null default '',
+  notes text not null default '',
+  created_by text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (year, seq)
+);
+create index if not exists quotes_lead on quotes(lead_id);
 `
+
+/** À incrémenter à chaque ajout dans SCHEMA : force la migration au démarrage suivant. */
+const SCHEMA_VERSION = '2'
 
 export async function seedCore(sql: Sql) {
   await sql`delete from packs`
@@ -205,8 +229,8 @@ async function migrate(sql: Sql) {
         }
       }
       await tx`insert into app_meta (key, value) values ('seeded', ${new Date().toISOString()})`
-      await tx`insert into app_meta (key, value) values ('schema_version', '1') on conflict (key) do update set value = excluded.value`
     }
+    await tx`insert into app_meta (key, value) values ('schema_version', ${SCHEMA_VERSION}) on conflict (key) do update set value = excluded.value`
   })
 }
 
@@ -215,7 +239,7 @@ async function ensureSchema(sql: Sql) {
   // Démarrage rapide : si le schéma est déjà en place, on évite la migration complète.
   try {
     const [r] = await sql`select value from app_meta where key = 'schema_version'`
-    if (r?.value === '1') return
+    if (r?.value === SCHEMA_VERSION) return
   } catch { /* tables absentes : première installation */ }
   await migrate(sql)
 }

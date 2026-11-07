@@ -2,15 +2,20 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api, ApiError } from './api'
 import { useAuth } from './auth'
-import type { AgencySettings, AppData, Interaction, KeywordQuery, Member, Pack, Presentation, Prospect, PublicUser, Role, TemplateData, TemplateImage, WebsiteTemplate } from '../shared/types'
+import type { AgencySettings, AppData, Interaction, KeywordQuery, Member, Pack, Presentation, Prospect, PublicUser, Quote, QuoteClient, QuoteData, QuoteStatus, Role, TemplateData, TemplateImage, WebsiteTemplate } from '../shared/types'
 import { uid } from '../shared/utils'
 
-interface Data extends AppData, TemplateData { users: PublicUser[] }
+interface Data extends AppData, TemplateData, QuoteData { users: PublicUser[] }
+
+export interface NewQuote { leadId: string | null; packIds: string[]; discount: number; client: QuoteClient; validityDays: number; notes: string; paymentTerms: string }
 
 const EMPTY: Data = {
-  prospects: [], packs: [], keywords: [], users: [],
+  prospects: [], packs: [], keywords: [], users: [], quotes: [],
   templateCategories: [], templates: [], templateImages: [], templatePresentations: [], templatePresentationItems: [], templateClientSelections: [],
-  settings: { agencyName: 'AgenceFlow', agencyTagline: '', logoFile: null, publicBaseUrl: '', contactEmail: '', contactPhone: '' },
+  settings: {
+    agencyName: 'AgenceFlow', agencyTagline: '', logoFile: null, publicBaseUrl: '', contactEmail: '', contactPhone: '',
+    legalName: '', address: '', postalCode: '', city: '', siret: '', vatNumber: '', vatRate: 20, iban: '', bic: '', quoteValidityDays: 30, paymentTerms: '', quoteNotes: '',
+  },
   siteTypes: [],
 }
 
@@ -44,6 +49,9 @@ interface Store extends Data {
   deletePresentation: (id: string) => Promise<void>
   selectInternal: (templateId: string, prospectId: string, message?: string) => Promise<void>
   saveSettings: (s: AgencySettings) => Promise<void>
+  /* Devis */
+  createQuote: (q: NewQuote) => Promise<Quote>
+  setQuoteStatus: (id: string, status: QuoteStatus) => Promise<void>
   presentationUrl: (p: Presentation) => string
   imagesOf: (templateId: string) => TemplateImage[]
   coverOf: (t: WebsiteTemplate) => TemplateImage | undefined
@@ -175,6 +183,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
         await refresh(true)
       },
       saveSettings: async (st) => { await api('PUT', '/api/settings', st); await refresh(true) },
+      // Pas de rechargement forcé ici : il écraserait une modification du lead pas encore envoyée (envoi différé de 600 ms).
+      createQuote: async (q) => {
+        const r = await api<Quote>('POST', '/api/quotes', q)
+        setData((d) => ({ ...d, quotes: [r, ...d.quotes] }))
+        return r
+      },
+      setQuoteStatus: async (id, status) => {
+        const r = await api<Quote>('PATCH', `/api/quotes/${id}`, { status })
+        // Même règle que le serveur pour le statut du lead
+        const leadStatus = (s: Prospect['status']): Prospect['status'] =>
+          status === 'accepte' ? 'gagne' : status === 'envoye' && ['a_qualifier', 'a_contacter', 'r1'].includes(s) ? 'devis' : s
+        setData((d) => ({
+          ...d,
+          quotes: d.quotes.map((x) => (x.id === id ? r : x)),
+          prospects: d.prospects.map((p) => (p.id === r.leadId ? { ...p, status: leadStatus(p.status) } : p)),
+        }))
+      },
       presentationUrl: (p) => `${(data.settings.publicBaseUrl || window.location.origin).replace(/\/+$/, '')}/p/${p.token}`,
       imagesOf: (templateId) => data.templateImages.filter((i) => i.templateId === templateId).sort((a, b) => a.order - b.order),
       coverOf: (t) => data.templateImages.find((i) => i.id === t.coverImageId) ?? data.templateImages.filter((i) => i.templateId === t.id).sort((a, b) => a.order - b.order)[0],

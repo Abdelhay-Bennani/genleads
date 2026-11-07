@@ -1,5 +1,5 @@
 import { CLOSED, STATUSES } from './data'
-import type { Need, Pack, Prospect, Status } from './types'
+import type { Need, Pack, Prospect, Quote, QuoteStatus, Status } from './types'
 
 export const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5)
 
@@ -33,6 +33,26 @@ export function quote(p: Prospect, packs: Pack[]) {
   const oneShot = oneShotRaw * (1 - (p.discount || 0) / 100)
   const mrr = sel.filter((k) => k.billing === 'monthly').reduce((s, k) => s + k.price, 0)
   return { sel, oneShotRaw, oneShot, mrr }
+}
+
+/** Totaux d'un devis émis (lignes figées au moment de l'émission). */
+export function quoteTotals(q: Pick<Quote, 'lines' | 'discount' | 'vatRate'>) {
+  const round = (n: number) => Math.round(n * 100) / 100
+  const oneShotRaw = q.lines.filter((l) => l.billing === 'oneshot').reduce((s, l) => s + l.price, 0)
+  const discountAmount = round(oneShotRaw * (q.discount || 0) / 100)
+  const oneShotHT = round(oneShotRaw - discountAmount)
+  const oneShotVAT = round(oneShotHT * q.vatRate / 100)
+  const monthlyHT = round(q.lines.filter((l) => l.billing === 'monthly').reduce((s, l) => s + l.price, 0))
+  const monthlyVAT = round(monthlyHT * q.vatRate / 100)
+  return { oneShotRaw, discountAmount, oneShotHT, oneShotVAT, oneShotTTC: round(oneShotHT + oneShotVAT), monthlyHT, monthlyVAT, monthlyTTC: round(monthlyHT + monthlyVAT) }
+}
+
+export const QUOTE_STATUS: Record<QuoteStatus, { label: string; hex: string }> = {
+  brouillon: { label: 'Brouillon', hex: '#94a3b8' },
+  envoye: { label: 'Envoyé', hex: '#a78bfa' },
+  accepte: { label: 'Accepté', hex: '#34d399' },
+  refuse: { label: 'Refusé', hex: '#f87171' },
+  annule: { label: 'Annulé', hex: '#64748b' },
 }
 
 /** Valeur one-shot d'une affaire : devis s'il existe, sinon budget estimé. */

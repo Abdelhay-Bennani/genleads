@@ -83,6 +83,10 @@ export interface AppData {
   keywords: KeywordQuery[]
 }
 
+export interface QuoteData {
+  quotes: Quote[]
+}
+
 /* ------------------------------------------------ Module « Mes Maquettes » */
 
 export interface TemplateCategory { id: string; name: string; builtin: boolean }
@@ -150,6 +154,59 @@ export interface AgencySettings {
   publicBaseUrl: string
   contactEmail: string
   contactPhone: string
+  /* Mentions légales (devis / factures) */
+  legalName: string
+  address: string
+  postalCode: string
+  city: string
+  siret: string
+  vatNumber: string
+  /** Taux de TVA en % (0 = franchise en base, art. 293 B du CGI). */
+  vatRate: number
+  iban: string
+  bic: string
+  quoteValidityDays: number
+  paymentTerms: string
+  quoteNotes: string
+}
+
+/* ------------------------------------------------ Devis */
+
+export type QuoteStatus = 'brouillon' | 'envoye' | 'accepte' | 'refuse' | 'annule'
+
+export interface QuoteLine {
+  name: string
+  description: string
+  price: number
+  billing: Billing
+}
+
+export interface QuoteClient {
+  company: string
+  contact: string
+  email: string
+  phone: string
+  address: string
+  postalCode: string
+  city: string
+}
+
+export interface Quote {
+  id: string
+  /** Numéro légal, continu par année : DEV-2026-001 */
+  number: string
+  leadId: string | null
+  status: QuoteStatus
+  client: QuoteClient
+  lines: QuoteLine[]
+  discount: number
+  vatRate: number
+  validUntil: string // YYYY-MM-DD
+  paymentTerms: string
+  notes: string
+  createdBy: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface TemplateData {

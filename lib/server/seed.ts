@@ -77,4 +77,8 @@ export const DEFAULT_CATEGORIES = [
 export const DEFAULT_SETTINGS = {
   agencyName: 'AgenceFlow', agencyTagline: 'Création de sites web pour artisans et PME', logoFile: null as string | null,
   publicBaseUrl: '', contactEmail: '', contactPhone: '',
+  legalName: '', address: '', postalCode: '', city: '', siret: '', vatNumber: '',
+  vatRate: 20, iban: '', bic: '', quoteValidityDays: 30,
+  paymentTerms: '30 % d’acompte à la signature, solde à la mise en ligne. Abonnements payables mensuellement.',
+  quoteNotes: 'Délai indicatif : 2 à 3 semaines après réception de vos contenus.',
 }

@@ -6,7 +6,7 @@ next-env.d.ts
 # secrets et données locales — ne jamais publier
 .env
 .env*
-data
+/data
 .vercel
 lancer.log
 vercel-url.txt

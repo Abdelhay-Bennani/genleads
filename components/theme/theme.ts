@@ -1,5 +1,7 @@
 'use client'
+import { frFR as coreFrFR } from '@mui/material/locale'
 import { alpha, createTheme } from '@mui/material/styles'
+import { frFR as gridFrFR } from '@mui/x-data-grid/locales'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /**
@@ -183,7 +185,7 @@ export const theme = createTheme({
       },
     },
   },
-})
+}, gridFrFR, coreFrFR) // tableaux et composants MUI en français (pagination, filtres…)
 
 /** Thème clair et sobre pour les pages vues par les clients (présentation de maquettes). */
 export const publicTheme = createTheme({

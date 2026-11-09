@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react'
 import { imgUrl } from '@/lib/client/images'
 import { useStore } from '@/lib/client/store'
 import { suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
-import { NEEDS, PACK_CATEGORIES, SECTORS, STATUSES } from '@/lib/shared/data'
+import { NEEDS, PACK_CATEGORIES, STATUSES } from '@/lib/shared/data'
 import type { InteractionType, Prospect } from '@/lib/shared/types'
 import { addDays, ensureHttp, eur, fmtDate, fmtDateTime, followState, mapsUrl, quote, telHref, todayISO, uid } from '@/lib/shared/utils'
 import { QuoteDialog } from '../quote/QuoteDialog'
@@ -120,8 +120,23 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
   )
 }
 
+/** Secteur d'activité en texte libre (plusieurs secteurs séparés par des virgules). */
+function SectorField({ sectors, onChange }: { sectors: string[]; onChange: (s: string[]) => void }) {
+  const [text, setText] = useState(sectors.join(', '))
+  const parse = (v: string) => [...new Set(v.split(/[,;]/).map((x) => x.trim()).filter(Boolean))]
+  return (
+    <TextField
+      label="Secteur d'activité"
+      placeholder="Ex. : Plomberie, Chauffage"
+      value={text}
+      onChange={(e) => { setText(e.target.value); onChange(parse(e.target.value)) }}
+      onBlur={() => setText(parse(text).join(', '))}
+      helperText="Texte libre — séparez plusieurs secteurs par une virgule"
+    />
+  )
+}
+
 function InfosTab({ p, patch }: { p: Prospect; patch: (c: Partial<Prospect>) => void }) {
-  const toggleSector = (s: string) => patch({ sectors: p.sectors.includes(s) ? p.sectors.filter((x) => x !== s) : [...p.sectors, s] })
   return (
     <Stack spacing={2.5}>
       <Grid container spacing={2}>
@@ -150,14 +165,7 @@ function InfosTab({ p, patch }: { p: Prospect; patch: (c: Partial<Prospect>) => 
           <TextField label="Budget estimé (€)" type="number" value={p.budget ?? ''} onChange={(e) => patch({ budget: e.target.value === '' ? null : Number(e.target.value) })} />
         </Grid>
       </Grid>
-      <Box>
-        <SectionLabel>Secteur d'activité</SectionLabel>
-        <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
-          {[...SECTORS, ...p.sectors.filter((s) => !SECTORS.includes(s))].map((s) => (
-            <Chip key={s} label={s} size="small" onClick={() => toggleSector(s)} color={p.sectors.includes(s) ? 'primary' : 'default'} variant={p.sectors.includes(s) ? 'filled' : 'outlined'} />
-          ))}
-        </Stack>
-      </Box>
+      <SectorField key={p.id} sectors={p.sectors} onChange={(sectors) => patch({ sectors })} />
       <TextField label="Description de l'activité" multiline minRows={3} value={p.activity} onChange={(e) => patch({ activity: e.target.value })} />
       <Typography variant="caption" color="text.secondary">Source : {p.source || '—'} · créé le {fmtDateTime(p.createdAt)}</Typography>
     </Stack>
@@ -378,4 +386,3 @@ function MaquettesTab({ p, isNew, goDevis }: { p: Prospect; isNew: boolean; goDe
     </Stack>
   )
 }
-

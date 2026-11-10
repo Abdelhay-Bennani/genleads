@@ -21,7 +21,7 @@ export const POST = route(async (req: Request) => {
     const cur = f && f.until > Date.now() ? f : { n: 0, until: Date.now() + 5 * 60e3 }
     cur.n += 1
     fails.set(key, cur)
-    throw bad(u && !u.active ? 'Ce compte est désactivé.' : 'Identifiant ou mot de passe incorrect.', 401)
+    throw bad('Identifiant ou mot de passe incorrect, ou compte désactivé.', 401)
   }
   fails.delete(key)
   await startSession(u.id as string)

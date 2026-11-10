@@ -1,10 +1,10 @@
 import { db } from '@/lib/server/db'
-import { bad, body, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, route } from '@/lib/server/http'
 import { recordSelection } from '@/lib/server/templates'
 
 /** Choix fait en rendez-vous, depuis le mode « Présentation client ». */
 export const POST = route(async (req: Request) => {
-  const me = await requireUser()
+  const me = await requireModule('maquettes', 'presentations')
   const b = await body<{ templateId: string; prospectId: string; message?: string }>(req)
   const sql = await db()
   const [t] = await sql`select id from website_templates where id = ${String(b.templateId ?? '')}`

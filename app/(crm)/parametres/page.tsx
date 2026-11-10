@@ -10,33 +10,38 @@ import {
 import { useRef, useState } from 'react'
 import { AccountDialog } from '@/components/shell/AccountDialog'
 import { PasswordField } from '@/components/shell/AuthScreens'
+import { PermissionsPanel } from '@/components/shell/PermissionsPanel'
 import { AgencyMark } from '@/components/templates/Portfolio'
 import { PageHeader, UserAvatar } from '@/components/ui'
 import { uploadLogo } from '@/lib/client/images'
 import { useStore } from '@/lib/client/store'
 import { isPrivateUrl } from '@/lib/client/templates'
+import { MODULES, type ModuleId } from '@/lib/shared/modules'
 import type { AppData, Prospect, PublicUser, Role } from '@/lib/shared/types'
 import { ROLE_LABEL } from '@/lib/shared/types'
 import { csvToProspects, download, fmtDateTime, normalize, prospectsToCSV, todayISO } from '@/lib/shared/utils'
 
-type T = 'agence' | 'utilisateurs' | 'donnees' | 'compte'
+type T = 'agence' | 'utilisateurs' | 'permissions' | 'donnees' | 'compte'
 
 export default function ParametresPage() {
   const store = useStore()
+  const showData = store.can('leads', 'prospects')
   const [tab, setTab] = useState<T>(store.isSuper ? 'agence' : 'donnees')
   const [account, setAccount] = useState(false)
   return (
     <>
       <PageHeader title="Paramètres" subtitle="Identité de l'agence, équipe, données et compte." />
-      <Tabs value={tab} onChange={(_e, v) => v === 'compte' ? setAccount(true) : setTab(v)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }} variant="scrollable">
+      <Tabs value={showData || store.isSuper ? tab : false} onChange={(_e, v) => v === 'compte' ? setAccount(true) : setTab(v)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }} variant="scrollable">
         {store.isSuper && <Tab value="agence" icon={<BusinessRounded fontSize="small" />} iconPosition="start" label="Agence" />}
         {store.isSuper && <Tab value="utilisateurs" icon={<PeopleAltOutlined fontSize="small" />} iconPosition="start" label="Utilisateurs" />}
-        <Tab value="donnees" icon={<StorageRounded fontSize="small" />} iconPosition="start" label="Données" />
+        {store.isSuper && <Tab value="permissions" icon={<ShieldOutlined fontSize="small" />} iconPosition="start" label="Permissions" />}
+        {showData && <Tab value="donnees" icon={<StorageRounded fontSize="small" />} iconPosition="start" label="Données" />}
         <Tab value="compte" icon={<ManageAccountsOutlined fontSize="small" />} iconPosition="start" label="Mon compte" />
       </Tabs>
       {tab === 'agence' && store.isSuper && <Agency />}
       {tab === 'utilisateurs' && store.isSuper && <Users />}
-      {tab === 'donnees' && <Data />}
+      {tab === 'permissions' && store.isSuper && <PermissionsPanel />}
+      {tab === 'donnees' && showData && <Data />}
       {account && <AccountDialog onClose={() => setAccount(false)} />}
     </>
   )
@@ -84,7 +89,7 @@ function Agency() {
         </Grid>
         <Divider sx={{ my: 3 }} />
         <Typography variant="h6">Mentions légales & devis</Typography>
-        <Typography variant="body2" color="text.secondary">Imprimées sur les devis PDF. Un devis sans ces mentions n’est pas conforme.</Typography>
+        <Typography variant="body2" color="text.secondary">Imprimées sur les devis et factures PDF. Un document sans ces mentions n’est pas conforme.</Typography>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid size={{ xs: 12, sm: 6 }}><TextField label="Raison sociale" value={s.legalName} onChange={(e) => setS({ ...s, legalName: e.target.value })} placeholder={s.agencyName} /></Grid>
           <Grid size={{ xs: 12, sm: 6 }}><TextField label="Adresse" value={s.address} onChange={(e) => setS({ ...s, address: e.target.value })} /></Grid>
@@ -98,6 +103,8 @@ function Agency() {
           <Grid size={{ xs: 12, sm: 2 }}><TextField label="BIC" value={s.bic} onChange={(e) => setS({ ...s, bic: e.target.value })} /></Grid>
           <Grid size={{ xs: 12, sm: 6 }}><TextField label="Conditions de paiement" multiline minRows={2} value={s.paymentTerms} onChange={(e) => setS({ ...s, paymentTerms: e.target.value })} /></Grid>
           <Grid size={12}><TextField label="Mentions par défaut en bas du devis" multiline minRows={2} value={s.quoteNotes} onChange={(e) => setS({ ...s, quoteNotes: e.target.value })} /></Grid>
+          <Grid size={{ xs: 12, sm: 3 }}><TextField label="Délai de paiement des factures (jours)" type="number" value={s.invoiceDueDays} onChange={(e) => setS({ ...s, invoiceDueDays: Math.max(0, Math.min(60, Number(e.target.value) || 0)) })} helperText="60 jours maximum" /></Grid>
+          <Grid size={{ xs: 12, sm: 9 }}><TextField label="Mentions obligatoires des factures" multiline minRows={2} value={s.invoiceNotes} onChange={(e) => setS({ ...s, invoiceNotes: e.target.value })} helperText="Pénalités de retard et indemnité forfaitaire de 40 € : obligatoires entre professionnels." /></Grid>
         </Grid>
         {err && <Alert severity="error" sx={{ mt: 2 }}>{err}</Alert>}
         <Stack direction="row" sx={{ justifyContent: 'flex-end', mt: 3 }}>
@@ -115,8 +122,8 @@ function Users() {
   return (
     <Stack spacing={2}>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 6 }}><Card sx={{ p: 2, height: '100%' }}><Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}><ShieldOutlined color="primary" fontSize="small" /><Typography sx={{ fontWeight: 600 }}>Super Admin</Typography></Stack><Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Tout faire, plus : gérer les utilisateurs, modifier les tarifs et l'identité de l'agence, supprimer des leads ou maquettes, restaurer ou réinitialiser les données.</Typography></Card></Grid>
-        <Grid size={{ xs: 12, md: 6 }}><Card sx={{ p: 2, height: '100%' }}><Typography sx={{ fontWeight: 600 }}>Admin</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Travail commercial au quotidien : leads, journal, relances, devis, maquettes et présentations, prospection, import et export CSV.</Typography></Card></Grid>
+        <Grid size={{ xs: 12, md: 6 }}><Card sx={{ p: 2, height: '100%' }}><Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}><ShieldOutlined color="primary" fontSize="small" /><Typography sx={{ fontWeight: 600 }}>Super Admin</Typography></Stack><Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Tout faire, plus : gérer les utilisateurs et leurs modules, modifier les tarifs et l'identité de l'agence, supprimer des leads ou maquettes, restaurer ou réinitialiser les données.</Typography></Card></Grid>
+        <Grid size={{ xs: 12, md: 6 }}><Card sx={{ p: 2, height: '100%' }}><Typography sx={{ fontWeight: 600 }}>Admin</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Accès aux modules que vous lui ouvrez dans l'onglet « Permissions » : tous par défaut.</Typography></Card></Grid>
       </Grid>
       <Card>
         <Stack direction="row" sx={{ p: 2, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -153,6 +160,7 @@ function Users() {
 function UserForm({ user, onClose }: { user?: PublicUser; onClose: () => void }) {
   const store = useStore()
   const [f, setF] = useState({ name: user?.name ?? '', username: user?.username ?? '', role: (user?.role ?? 'admin') as Role, active: user?.active ?? true, password: '' })
+  const [off, setOff] = useState<ModuleId[]>([])
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const self = user?.id === store.me.id
@@ -160,7 +168,7 @@ function UserForm({ user, onClose }: { user?: PublicUser; onClose: () => void })
     setBusy(true); setErr(null)
     try {
       if (user) await store.updateUser(user.id, { name: f.name, username: f.username, role: f.role, active: f.active })
-      else await store.createUser({ name: f.name, username: f.username, password: f.password, role: f.role })
+      else await store.createUser({ name: f.name, username: f.username, password: f.password, role: f.role, disabledModules: off })
       store.notify(user ? 'Utilisateur modifié' : `Compte créé pour ${f.name}`); onClose()
     } catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
   }
@@ -176,6 +184,14 @@ function UserForm({ user, onClose }: { user?: PublicUser; onClose: () => void })
             <ToggleButton value="admin">Admin</ToggleButton><ToggleButton value="super_admin">Super Admin</ToggleButton>
           </ToggleButtonGroup>
           {self && <Typography variant="caption" color="text.secondary">Vous ne pouvez pas changer votre propre rôle.</Typography>}
+          {!user && f.role === 'admin' && (
+            <Box>
+              <Typography variant="caption" color="text.secondary">Modules ouverts (modifiables ensuite dans « Permissions »)</Typography>
+              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75, mt: 0.75 }}>
+                {MODULES.map((m) => { const on = !off.includes(m.id); return <Chip key={m.id} size="small" label={m.label} color={on ? 'primary' : 'default'} variant={on ? 'filled' : 'outlined'} onClick={() => setOff(on ? [...off, m.id] : off.filter((x) => x !== m.id))} /> })}
+              </Stack>
+            </Box>
+          )}
           {user && !self && <FormControlLabel control={<Switch checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} />} label="Compte actif" />}
           {user && user.name !== f.name && <Typography variant="caption" color="text.secondary">Les leads assignés et le journal seront mis à jour avec le nouveau nom.</Typography>}
           {err && <Alert severity="error">{err}</Alert>}
@@ -256,9 +272,9 @@ function Data() {
       </CardContent></Card>
       <Card><CardContent>
         <Typography variant="h6">Sauvegarde</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Leads, journal, packs et requêtes dans un fichier JSON. {store.isSuper ? 'La restauration remplace les leads, packs et requêtes actuels.' : 'La restauration est réservée au Super Admin.'} Les maquettes et leurs images restent dans la base PostgreSQL.</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Leads, journal, packs, requêtes, devis, factures et paiements dans un fichier JSON. {store.isSuper ? 'La restauration remplace les leads, packs et requêtes actuels ; les devis, factures et paiements ne sont jamais modifiés.' : 'La restauration est réservée au Super Admin.'} Les maquettes et leurs images restent dans la base PostgreSQL.</Typography>
         <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap', rowGap: 1 }}>
-          <Button variant="outlined" startIcon={<DownloadRounded />} onClick={() => download(`agenceflow-sauvegarde-${todayISO()}.json`, JSON.stringify({ prospects: store.prospects, packs: store.packs, keywords: store.keywords }, null, 2), 'application/json')}>Télécharger la sauvegarde</Button>
+          <Button variant="outlined" startIcon={<DownloadRounded />} onClick={() => download(`agenceflow-sauvegarde-${todayISO()}.json`, JSON.stringify({ prospects: store.prospects, packs: store.packs, keywords: store.keywords, quotes: store.quotes, invoices: store.invoices, payments: store.payments }, null, 2), 'application/json')}>Télécharger la sauvegarde</Button>
           {store.isSuper && <Button variant="outlined" startIcon={<UploadFileRounded />} onClick={() => jsonRef.current?.click()}>Restaurer une sauvegarde</Button>}
           <input ref={jsonRef} type="file" accept=".json,application/json" hidden onChange={(e) => { onJSON(e.target.files?.[0]); e.target.value = '' }} />
         </Stack>

@@ -9,9 +9,10 @@ import {
 } from '@mui/material'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { imgUrl } from '@/lib/client/images'
-import { safeHref } from '@/lib/client/templates'
+import { isHostedSite, safeHref } from '@/lib/client/templates'
 import type { PortfolioTemplate } from '@/lib/shared/types'
 import { publicTheme } from '../theme/theme'
+import { SitePreview } from './SitePreview'
 
 /** Vitrine « Présentation client » : en rendez-vous (interne) et sur la page publique partagée. */
 
@@ -76,7 +77,8 @@ function PortfolioInner({ agency, eyebrow, title, message, templates, selectedId
                 <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 4, transition: '0.25s', borderColor: chosen ? 'success.main' : 'rgba(15,23,42,0.08)', borderWidth: chosen ? 2 : 1, '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 24px 48px -20px rgba(15,23,42,0.3)' } }}>
                   <CardActionArea onClick={() => setOpenId(t.id)} sx={{ position: 'relative', aspectRatio: '16 / 10', bgcolor: '#eef0f3', overflow: 'hidden' }}>
                     {cover ? <Box component="img" src={imgUrl(cover.thumb || cover.file)} alt={t.name} loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-                      : <Typography color="text.secondary" align="center">Aperçu bientôt disponible</Typography>}
+                      : isHostedSite(t.demoUrl) ? <SitePreview url={t.demoUrl} title={t.name} />
+                        : <Typography color="text.secondary" align="center">Aperçu bientôt disponible</Typography>}
                     {chosen && <Chip icon={<CheckRounded />} label="Votre choix" color="success" size="small" sx={{ position: 'absolute', top: 12, left: 12, fontWeight: 700 }} />}
                   </CardActionArea>
                   <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -167,7 +169,8 @@ function Detail({ t, chosen, selectMode, prospects, defaultProspectId, onSelect,
             </ToggleButtonGroup>
           )}
           <Box sx={{ flex: 1, minHeight: 0, display: 'flex', justifyContent: 'center' }}>
-            {!shot ? <Box sx={{ height: 280, width: '100%', bgcolor: '#fff', borderRadius: 3, display: 'grid', placeItems: 'center', color: 'text.secondary' }}>Pas encore de capture d'écran</Box>
+            {!shot && isHostedSite(t.demoUrl) ? <Box component="iframe" src={t.demoUrl} title={t.name} sandbox="allow-scripts allow-forms" sx={{ width: '100%', maxWidth: 1100, height: { xs: '60vh', md: '100%' }, border: 0, bgcolor: '#fff', borderRadius: 3 }} />
+              : !shot ? <Box sx={{ height: 280, width: '100%', bgcolor: '#fff', borderRadius: 3, display: 'grid', placeItems: 'center', color: 'text.secondary' }}>Pas encore de capture d'écran</Box>
               : device === 'desktop' ? (
                 <Box sx={{ width: '100%', maxWidth: 1100, height: { xs: '60vh', md: '100%' }, display: 'flex', flexDirection: 'column', bgcolor: '#fff', borderRadius: 3, overflow: 'hidden', boxShadow: '0 30px 60px -25px rgba(15,23,42,0.45)' }}>
                   <Stack direction="row" spacing={0.75} sx={{ px: 1.5, py: 1, bgcolor: '#f8fafc', borderBottom: '1px solid #eef0f3', alignItems: 'center' }}>

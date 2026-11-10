@@ -17,12 +17,12 @@ export const money = (n: number) => {
   const [int, dec] = Math.abs(n).toFixed(2).split('.')
   return `${n < 0 ? '-' : ''}${int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')},${dec} €`
 }
-const longDate = (iso: string) => {
+export const longDate = (iso: string) => {
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number)
   return new Date(y, m - 1, d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-const st = StyleSheet.create({
+export const st = StyleSheet.create({
   page: { paddingTop: 36, paddingBottom: 56, paddingHorizontal: 44, fontFamily: 'Helvetica', fontSize: 9.5, color: INK, lineHeight: 1.4 },
   row: { flexDirection: 'row' },
   between: { flexDirection: 'row', justifyContent: 'space-between' },

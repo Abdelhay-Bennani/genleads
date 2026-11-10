@@ -1,9 +1,9 @@
 import { db } from '@/lib/server/db'
-import { bad, rateLimit, requireUser, route } from '@/lib/server/http'
+import { bad, rateLimit, requireModule, route } from '@/lib/server/http'
 import { collectGarbage, MAX_UPLOAD, newFileId, sniff } from '@/lib/server/templates'
 
 export const POST = route(async (req: Request) => {
-  const me = await requireUser()
+  const me = await requireModule('maquettes')
   if (rateLimit('upload:' + me.id, 300, 3600e3)) throw bad('Trop d’envois, réessayez plus tard.', 429)
   const len = Number(req.headers.get('content-length') ?? 0)
   if (len > MAX_UPLOAD) throw bad('Image trop lourde (4 Mo maximum après compression).', 413)

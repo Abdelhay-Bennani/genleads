@@ -1,10 +1,10 @@
 import { db, run } from '@/lib/server/db'
-import { bad, body, requireSuper, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, requireSuper, route } from '@/lib/server/http'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export const PATCH = route(async (req: Request, { params }: Ctx) => {
-  await requireUser()
+  await requireModule('maquettes')
   const { id } = await params
   const name = String((await body<{ name: string }>(req)).name ?? '').trim().slice(0, 60)
   if (!name) throw bad('Nom de catégorie requis.')

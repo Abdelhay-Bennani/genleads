@@ -1,10 +1,14 @@
 import { CLOSED, STATUSES } from './data'
-import type { Need, Pack, Prospect, Quote, QuoteStatus, Status } from './types'
+import type { Invoice, Need, Pack, PaymentMethod, Prospect, Quote, QuoteStatus, Status } from './types'
 
 export const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5)
 
 const eurFmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 export const eur = (n: number) => eurFmt.format(Math.round(n))
+const eur2Fmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
+/** Montant au centime près (factures, paiements). */
+export const eur2 = (n: number) => eur2Fmt.format(n)
+export const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100
 
 export const todayISO = () => {
   const d = new Date()
@@ -49,6 +53,47 @@ export function quoteTotals(q: Pick<Quote, 'lines' | 'discount' | 'vatRate'>) {
   const monthlyHT = round(q.lines.filter((l) => l.billing === 'monthly').reduce((s, l) => s + l.price, 0))
   const monthlyVAT = round(monthlyHT * q.vatRate / 100)
   return { oneShotRaw, discountAmount, oneShotHT, oneShotVAT, oneShotTTC: round(oneShotHT + oneShotVAT), monthlyHT, monthlyVAT, monthlyTTC: round(monthlyHT + monthlyVAT) }
+}
+
+/** Totaux d'une facture : la somme des lignes (remises et acomptes déduits sont des lignes négatives). */
+export function invoiceTotals(i: Pick<Invoice, 'lines' | 'vatRate'>) {
+  const ht = round2(i.lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0))
+  const vat = round2((ht * i.vatRate) / 100)
+  return { ht, vat, ttc: round2(ht + vat) }
+}
+
+export type InvoiceState = 'emise' | 'envoyee' | 'partielle' | 'retard' | 'payee' | 'annulee' | 'avoir'
+export const INVOICE_STATE: Record<InvoiceState, { label: string; color: 'default' | 'primary' | 'info' | 'warning' | 'success' | 'error' }> = {
+  emise: { label: 'Émise', color: 'default' },
+  envoyee: { label: 'Envoyée', color: 'primary' },
+  partielle: { label: 'Paiement partiel', color: 'info' },
+  retard: { label: 'En retard', color: 'error' },
+  payee: { label: 'Payée', color: 'success' },
+  annulee: { label: 'Annulée', color: 'default' },
+  avoir: { label: 'Avoir', color: 'warning' },
+}
+/** État affiché : le retard et le paiement partiel se déduisent de l'échéance et des paiements. */
+export function invoiceState(i: Invoice, paid: number, today = todayISO()): InvoiceState {
+  if (i.kind === 'avoir') return 'avoir'
+  if (i.status === 'annulee' || i.status === 'payee') return i.status
+  if (i.dueDate < today) return 'retard'
+  return paid > 0 ? 'partielle' : i.status
+}
+export const INVOICE_TYPE: Record<Invoice['type'], string> = {
+  totale: 'Facture', acompte: 'Acompte', solde: 'Solde', mensualite: 'Mensualité', libre: 'Facture libre', avoir: 'Avoir',
+}
+export const PAYMENT_METHODS: { id: PaymentMethod; label: string }[] = [
+  { id: 'virement', label: 'Virement' }, { id: 'carte', label: 'Carte bancaire' }, { id: 'cheque', label: 'Chèque' },
+  { id: 'especes', label: 'Espèces' }, { id: 'prelevement', label: 'Prélèvement' }, { id: 'autre', label: 'Autre' },
+]
+export const fmtDateLong = (iso: string | null) => {
+  if (!iso) return ''
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+export const periodLabel = (period: string) => {
+  const [y, m] = period.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 }
 
 export const QUOTE_STATUS: Record<QuoteStatus, { label: string; hex: string }> = {
@@ -106,8 +151,10 @@ export function parseCSV(text: string): string[][] {
   return rows.filter((r) => r.some((c) => c.trim() !== ''))
 }
 
-const csvCell = (v: string | number | null | undefined) => {
-  const s = v == null ? '' : String(v)
+export const csvCell = (v: string | number | null | undefined) => {
+  // Une cellule commençant par = ou @ serait exécutée comme formule à l'ouverture dans Excel
+  const raw = v == null ? '' : String(v)
+  const s = /^[=@]|^[+-](?![\d\s])/.test(raw) ? `'${raw}` : raw
   return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 

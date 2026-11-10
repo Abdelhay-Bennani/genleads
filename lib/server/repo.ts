@@ -2,8 +2,9 @@ import 'server-only'
 import crypto from 'node:crypto'
 import type postgres from 'postgres'
 import { SITE_TYPES } from '../shared/data'
+import { hasModule, type ModuleId } from '../shared/modules'
 import type {
-  AgencySettings, ClientSelection, Interaction, KeywordQuery, Pack, Presentation, PresentationItem, Prospect, PublicUser, Quote,
+  AgencySettings, ClientSelection, Interaction, Invoice, KeywordQuery, Pack, Payment, Presentation, PresentationItem, Prospect, PublicUser, Quote,
   TemplateCategory, TemplateImage, WebsiteTemplate,
 } from '../shared/types'
 import { DEFAULT_SETTINGS } from './seed'
@@ -32,6 +33,7 @@ export const safeUrl = (v: unknown) => {
 export const toUser = (r: Row): PublicUser => ({
   id: r.id as string, name: r.name as string, username: r.username as string, role: r.role as PublicUser['role'],
   active: r.active as boolean, createdAt: iso(r.created_at)!, lastLoginAt: iso(r.last_login_at),
+  disabledModules: (r.disabled_modules as ModuleId[] | null) ?? [],
 })
 
 const toInteraction = (r: Row): Interaction => ({
@@ -49,12 +51,12 @@ const toLead = (r: Row, interactions: Interaction[]): Prospect => ({
   createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
 })
 
-const toTemplate = (r: Row): WebsiteTemplate => ({
+const toTemplate = (r: Row, site: WebsiteTemplate['site'] = null): WebsiteTemplate => ({
   id: r.id as string, name: r.name as string, categoryId: (r.category_id as string) ?? null, siteType: r.site_type as string,
   shortDescription: r.short_description as string, description: r.description as string, features: r.features as string[],
   technologies: r.technologies as string[], tags: r.tags as string[], demoUrl: r.demo_url as string, demoUrlMobile: r.demo_url_mobile as string,
   suggestedPackIds: r.suggested_pack_ids as string[], status: r.status as WebsiteTemplate['status'], coverImageId: (r.cover_image_id as string) ?? null,
-  createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
+  site, createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
 })
 
 const toImage = (r: Row): TemplateImage => ({
@@ -80,6 +82,19 @@ export const toQuote = (r: Row): Quote => ({
   createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
 })
 
+export const toInvoice = (r: Row): Invoice => ({
+  id: r.id as string, number: r.number as string, kind: r.kind as Invoice['kind'], type: r.type as Invoice['type'], quoteId: (r.quote_id as string) ?? null,
+  leadId: (r.lead_id as string) ?? null, creditedInvoiceId: (r.credited_invoice_id as string) ?? null, period: (r.period as string) ?? null,
+  status: r.status as Invoice['status'], client: r.client as Invoice['client'], lines: r.lines as Invoice['lines'], vatRate: Number(r.vat_rate ?? 0),
+  issueDate: r.issue_date as string, dueDate: r.due_date as string, paymentTerms: r.payment_terms as string, notes: r.notes as string,
+  createdBy: r.created_by as string, createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
+})
+
+export const toPayment = (r: Row): Payment => ({
+  id: r.id as string, invoiceId: r.invoice_id as string, amount: Number(r.amount), date: r.date as string, method: r.method as Payment['method'],
+  reference: r.reference as string, notes: r.notes as string, createdBy: r.created_by as string, createdAt: iso(r.created_at)!,
+})
+
 /* ------------------------------------------------------------ lecture */
 
 export async function getSettings(sql: Sql): Promise<AgencySettings> {
@@ -96,7 +111,7 @@ export async function loadLeads(sql: Sql, ids?: string[]): Promise<Prospect[]> {
 }
 
 export async function loadAll(sql: Sql) {
-  const [prospects, packs, keywords, users, cats, templates, images, pres, items, sels, settings, quotes] = await Promise.all([
+  const [prospects, packs, keywords, users, cats, templates, images, pres, items, sels, settings, quotes, invoices, payments, sites] = await Promise.all([
     loadLeads(sql),
     sql`select * from packs order by position, name`,
     sql`select * from prospecting_queries order by position`,
@@ -109,14 +124,19 @@ export async function loadAll(sql: Sql) {
     sql`select * from template_client_selections order by created_at desc`,
     getSettings(sql),
     sql`select * from quotes order by year desc, seq desc`,
+    sql`select * from invoices order by year desc, created_at desc`,
+    sql`select * from payments order by date desc, created_at desc`,
+    sql`select f.template_id, count(*)::int as files, sum(f.size)::bigint as size from template_site_files f
+      join website_templates t on t.id = f.template_id and t.site_version = f.version group by f.template_id`,
   ])
+  const siteOf = new Map(sites.map((s) => [s.template_id as string, { files: s.files as number, size: Number(s.size) }]))
   return {
     prospects,
     packs: packs.map((r): Pack => ({ id: r.id, name: r.name, category: r.category, price: Number(r.price), billing: r.billing, description: r.description, active: r.active })),
     keywords: keywords.map((r): KeywordQuery => ({ id: r.id, category: r.category, label: r.label, query: r.query })),
     users: users.map(toUser),
     templateCategories: cats.map((r): TemplateCategory => ({ id: r.id, name: r.name, builtin: r.builtin })),
-    templates: templates.map(toTemplate),
+    templates: templates.map((r) => toTemplate(r, siteOf.get(r.id as string) ?? null)),
     templateImages: images.map(toImage),
     templatePresentations: pres.map(toPresentation),
     templatePresentationItems: items.map((r): PresentationItem => ({ id: r.id, presentationId: r.presentation_id, templateId: r.template_id, order: r.position })),
@@ -124,6 +144,32 @@ export async function loadAll(sql: Sql) {
     settings,
     siteTypes: SITE_TYPES,
     quotes: quotes.map(toQuote),
+    invoices: invoices.map(toInvoice),
+    payments: payments.map(toPayment),
+  }
+}
+
+/** Ne renvoie à un Admin que les données des modules qui lui sont ouverts. */
+export function scopeData(d: Awaited<ReturnType<typeof loadAll>>, u: PublicUser) {
+  if (u.role === 'super_admin') return d
+  const can = (...m: ModuleId[]) => hasModule(u, ...m)
+  const finance = can('factures', 'paiements', 'clients', 'rapports')
+  const quotes = can('devis', 'factures', 'rapports') ? d.quotes : []
+  const invoices = finance ? d.invoices : []
+  const tpl = can('maquettes', 'presentations')
+  const presentations = tpl ? d.templatePresentations : []
+  let prospects = d.prospects
+  if (!can('leads', 'prospects', 'dashboard', 'rapports')) {
+    // Sans accès au pipeline : seulement les fiches rattachées aux documents visibles
+    const linked = new Set<string | null>([...quotes.map((q) => q.leadId), ...invoices.map((i) => i.leadId), ...presentations.map((p) => p.prospectId)])
+    prospects = d.prospects.filter((p) => linked.has(p.id) || (can('clients') && p.status === 'gagne'))
+  }
+  return {
+    ...d, prospects, quotes, invoices, payments: finance ? d.payments : [],
+    keywords: can('leads', 'prospects') ? d.keywords : [],
+    templateCategories: tpl ? d.templateCategories : [], templates: tpl ? d.templates : [], templateImages: tpl ? d.templateImages : [],
+    templatePresentations: presentations, templatePresentationItems: tpl ? d.templatePresentationItems : [], templateClientSelections: tpl ? d.templateClientSelections : [],
+    users: d.users.map((x) => (x.id === u.id ? x : { ...x, disabledModules: [] })),
   }
 }
 

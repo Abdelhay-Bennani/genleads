@@ -18,6 +18,9 @@ export function sniff(buf: Buffer): string | null {
   return null
 }
 
+/** Une URL de démo locale n'est acceptée que si elle désigne le site importé de cette maquette. */
+const demoUrl = (v: unknown, id: string) => (typeof v === 'string' && v.startsWith(`/site/${id}/`) ? v.slice(0, 500) : safeUrl(v))
+
 export const newFileId = () => crypto.randomBytes(16).toString('hex')
 export const newToken = () => crypto.randomBytes(24).toString('base64url')
 
@@ -32,7 +35,7 @@ export async function saveTemplate(sql: Sql, id: string, b: Record<string, unkno
     site_type: SITE_TYPES.includes(b.siteType as string) ? (b.siteType as string) : 'Site vitrine',
     short_description: str(b.shortDescription, 220), description: str(b.description, 3000),
     features: list(b.features, 20), technologies: list(b.technologies, 20), tags: list(b.tags, 30),
-    demo_url: safeUrl(b.demoUrl), demo_url_mobile: safeUrl(b.demoUrlMobile), suggested_pack_ids: validPacks,
+    demo_url: demoUrl(b.demoUrl, id), demo_url_mobile: safeUrl(b.demoUrlMobile), suggested_pack_ids: validPacks,
     status: b.status === 'archived' ? 'archived' : 'active',
   }
   const imgs = (Array.isArray(b.images) ? b.images : []).slice(0, 40).filter((i: Record<string, unknown>) => i && FILE_ID.test(String(i.file)) && FILE_ID.test(String(i.thumb ?? i.file)))

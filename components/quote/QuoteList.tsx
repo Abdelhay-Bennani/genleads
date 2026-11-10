@@ -2,6 +2,7 @@
 import { DownloadRounded, MoreVertRounded } from '@mui/icons-material'
 import { Box, Chip, CircularProgress, Divider, IconButton, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material'
 import { useState } from 'react'
+import { InvoiceDialog } from '@/components/invoice/InvoiceDialog'
 import { downloadQuotePdf } from '@/lib/client/quotePdf'
 import { useStore } from '@/lib/client/store'
 import type { Quote, QuoteStatus } from '@/lib/shared/types'
@@ -28,14 +29,17 @@ export function QuoteActions({ q }: { q: Quote }) {
   const store = useStore()
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const [busy, setBusy] = useState(false)
+  const [billing, setBilling] = useState(false)
+  const canBill = q.status === 'accepte' && store.can('factures')
   const run = async (fn: () => Promise<void>) => { setBusy(true); try { await fn() } catch (e) { store.notify((e as Error).message || 'Erreur', false) } finally { setBusy(false) } }
   return (
     <Stack direction="row" sx={{ alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
       <Tooltip title="Télécharger le PDF">
         <span><IconButton size="small" disabled={busy} onClick={() => run(() => downloadQuotePdf(q, store.settings))}>{busy ? <CircularProgress size={16} /> : <DownloadRounded fontSize="small" />}</IconButton></span>
       </Tooltip>
-      {NEXT[q.status].length > 0 && <IconButton size="small" disabled={busy} aria-label="Changer le statut" onClick={(e) => setAnchor(e.currentTarget)}><MoreVertRounded fontSize="small" /></IconButton>}
+      {(NEXT[q.status].length > 0 || canBill) && <IconButton size="small" disabled={busy} aria-label="Changer le statut" onClick={(e) => setAnchor(e.currentTarget)}><MoreVertRounded fontSize="small" /></IconButton>}
       <Menu anchorEl={anchor} open={!!anchor} onClose={() => setAnchor(null)}>
+        {canBill && <MenuItem onClick={() => { setAnchor(null); setBilling(true) }}>Facturer ce devis…</MenuItem>}
         {NEXT[q.status].map((st) => (
           <MenuItem key={st} sx={st === 'annule' ? { color: 'error.main' } : undefined}
             onClick={() => { setAnchor(null); run(async () => { await store.setQuoteStatus(q.id, st); store.notify(`Devis ${q.number} : ${QUOTE_STATUS[st].label.toLowerCase()}`) }) }}>
@@ -43,6 +47,7 @@ export function QuoteActions({ q }: { q: Quote }) {
           </MenuItem>
         ))}
       </Menu>
+      {billing && <InvoiceDialog quote={q} onClose={() => setBilling(false)} />}
     </Stack>
   )
 }

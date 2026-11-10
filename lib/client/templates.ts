@@ -45,4 +45,6 @@ export const isPrivateUrl = (u: string) => {
     return h === 'localhost' || h.endsWith('.local') || /^127\.|^10\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\./.test(h)
   } catch { return true }
 }
-export const safeHref = (u: string) => (/^https?:\/\//i.test(u) ? u : undefined)
+/** Démos cliquables : URL externe ou site importé dans le CRM (/site/…). */
+export const safeHref = (u: string) => (/^https?:\/\//i.test(u) || u.startsWith('/site/') ? u : undefined)
+export const isHostedSite = (u: string) => u.startsWith('/site/')

@@ -1,12 +1,12 @@
 import { db, run } from '@/lib/server/db'
-import { bad, body, requireSuper, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, requireSuper, route } from '@/lib/server/http'
 import { cleanLead, insertLead, loadLeads } from '@/lib/server/repo'
 import type { Prospect } from '@/lib/shared/types'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export const PUT = route(async (req: Request, { params }: Ctx) => {
-  await requireUser()
+  await requireModule('leads', 'prospects', 'clients')
   const { id } = await params
   const p = cleanLead(await body<Prospect>(req) as Prospect & Record<string, unknown>)
   if (!p || p.id !== id) throw bad('Prospect invalide.')

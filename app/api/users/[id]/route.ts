@@ -1,6 +1,7 @@
 import { db } from '@/lib/server/db'
 import { bad, body, checkPassword, checkUsername, hashPassword, requireSuper, route } from '@/lib/server/http'
 import { toUser } from '@/lib/server/repo'
+import { cleanModules } from '@/lib/shared/modules'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -15,13 +16,14 @@ export const PATCH = route(async (req: Request, { params }: Ctx) => {
   const sql = await db()
   const [u] = await sql`select * from users where id = ${id}`
   if (!u) throw bad('Utilisateur introuvable.', 404)
-  const b = await body<{ name?: string; username?: string; role?: string; active?: boolean; password?: string }>(req)
+  const b = await body<{ name?: string; username?: string; role?: string; active?: boolean; password?: string; disabledModules?: unknown }>(req)
   const losingSuper = (b.role !== undefined && b.role !== 'super_admin') || b.active === false
   if (u.role === 'super_admin' && u.active && losingSuper && (await activeSupers(sql)) <= 1) throw bad('Il doit rester au moins un Super Admin actif.')
   if (b.active === false && id === me.id) throw bad('Vous ne pouvez pas désactiver votre propre compte.')
   if (b.role !== undefined && !['admin', 'super_admin'].includes(b.role)) throw bad('Rôle invalide.')
   if (b.username !== undefined) await checkUsername(b.username, id)
   if (b.password) checkPassword(b.password)
+  if (b.disabledModules !== undefined && (b.role ?? u.role) !== 'admin') throw bad('Les modules se règlent uniquement pour un compte Admin.')
   await sql.begin(async (tx) => {
     if (b.name !== undefined) {
       const n = String(b.name).trim().slice(0, 80)
@@ -36,6 +38,7 @@ export const PATCH = route(async (req: Request, { params }: Ctx) => {
         await tx`update users set name = ${n} where id = ${id}`
       }
     }
+    if (b.disabledModules !== undefined) await tx`update users set disabled_modules = ${cleanModules(b.disabledModules)} where id = ${id}`
     if (b.username !== undefined) await tx`update users set username = ${b.username.trim()} where id = ${id}`
     if (b.role !== undefined && id !== me.id) await tx`update users set role = ${b.role} where id = ${id}`
     if (b.active !== undefined) {

@@ -195,10 +195,65 @@ create table if not exists quotes (
   unique (year, seq)
 );
 create index if not exists quotes_lead on quotes(lead_id);
+
+alter table users add column if not exists disabled_modules text[] not null default '{}';
+alter table website_templates add column if not exists site_version text;
+
+create table if not exists template_site_files (
+  template_id text not null references website_templates(id) on delete cascade,
+  version text not null,
+  path text not null,
+  mime text not null,
+  size int not null,
+  data bytea not null,
+  created_at timestamptz not null default now(),
+  primary key (template_id, version, path)
+);
+
+create table if not exists invoices (
+  id text primary key,
+  number text not null unique,
+  kind text not null default 'facture' check (kind in ('facture', 'avoir')),
+  type text not null default 'libre' check (type in ('totale', 'acompte', 'solde', 'mensualite', 'libre', 'avoir')),
+  year int not null,
+  seq int not null,
+  quote_id text references quotes(id) on delete set null,
+  lead_id text references leads(id) on delete set null,
+  credited_invoice_id text references invoices(id) on delete set null,
+  period text,
+  status text not null default 'emise' check (status in ('emise', 'envoyee', 'payee', 'annulee')),
+  client jsonb not null,
+  lines jsonb not null,
+  vat_rate numeric not null default 20,
+  issue_date text not null,
+  due_date text not null,
+  payment_terms text not null default '',
+  notes text not null default '',
+  created_by text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (kind, year, seq)
+);
+create index if not exists invoices_lead on invoices(lead_id);
+create index if not exists invoices_quote on invoices(quote_id);
+create unique index if not exists invoices_period_key on invoices (quote_id, period) where period is not null and status <> 'annulee';
+
+create table if not exists payments (
+  id text primary key,
+  invoice_id text not null references invoices(id) on delete restrict,
+  amount numeric not null check (amount > 0),
+  date text not null,
+  method text not null default 'virement',
+  reference text not null default '',
+  notes text not null default '',
+  created_by text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists payments_invoice on payments(invoice_id);
 `
 
 /** À incrémenter à chaque ajout dans SCHEMA : force la migration au démarrage suivant. */
-const SCHEMA_VERSION = '3'
+const SCHEMA_VERSION = '4'
 
 export async function seedCore(sql: Sql) {
   await sql`delete from packs`

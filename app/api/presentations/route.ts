@@ -1,10 +1,10 @@
 import { db } from '@/lib/server/db'
-import { bad, body, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, route } from '@/lib/server/http'
 import { addInteraction, uid } from '@/lib/server/repo'
 import { newToken } from '@/lib/server/templates'
 
 export const POST = route(async (req: Request) => {
-  const me = await requireUser()
+  const me = await requireModule('maquettes', 'presentations')
   const b = await body<{ templateIds: string[]; prospectId?: string | null; title?: string; message?: string }>(req)
   const sql = await db()
   const wanted = Array.isArray(b.templateIds) ? b.templateIds.map(String).slice(0, 24) : []

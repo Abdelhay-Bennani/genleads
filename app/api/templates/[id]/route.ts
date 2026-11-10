@@ -1,11 +1,11 @@
 import { db, run } from '@/lib/server/db'
-import { bad, body, requireSuper, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, requireSuper, route } from '@/lib/server/http'
 import { saveTemplate } from '@/lib/server/templates'
 
 type Ctx = { params: Promise<{ id: string }> }
 
 export const PUT = route(async (req: Request, { params }: Ctx) => {
-  await requireUser()
+  await requireModule('maquettes')
   const { id } = await params
   if (!/^[\w-]{1,40}$/.test(id)) throw bad('Identifiant invalide.')
   const b = await body(req)

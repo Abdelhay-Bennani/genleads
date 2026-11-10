@@ -1,9 +1,9 @@
 import { db } from '@/lib/server/db'
-import { bad, body, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, route } from '@/lib/server/http'
 import { uid } from '@/lib/server/repo'
 
 export const POST = route(async (req: Request) => {
-  await requireUser()
+  await requireModule('maquettes')
   const name = String((await body<{ name: string }>(req)).name ?? '').trim().slice(0, 60)
   if (!name) throw bad('Nom de catégorie requis.')
   const sql = await db()

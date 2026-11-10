@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { hasModule, type ModuleId } from '../shared/modules'
 import type { PublicUser } from '../shared/types'
 import { ConfigError, db, run } from './db'
 import { toUser } from './repo'
@@ -52,6 +53,12 @@ export async function startSession(userId: string) {
   })
 }
 
+/** Hachage de la session courante (pour déconnecter uniquement les autres appareils). */
+export async function currentSessionHash() {
+  const token = (await cookies()).get(COOKIE)?.value
+  return token ? hashToken(token) : ''
+}
+
 export async function endSession() {
   const jar = await cookies()
   const token = jar.get(COOKIE)?.value
@@ -78,6 +85,13 @@ export async function requireUser() {
 export async function requireSuper() {
   const u = await requireUser()
   if (u.role !== 'super_admin') throw bad('Action réservée au Super Admin.', 403)
+  return u
+}
+
+/** Autorise l'action si l'un des modules cités est actif pour l'utilisateur (toujours vrai pour un Super Admin). */
+export async function requireModule(...modules: ModuleId[]) {
+  const u = await requireUser()
+  if (!hasModule(u, ...modules)) throw bad('Ce module est désactivé pour votre compte.', 403)
   return u
 }
 

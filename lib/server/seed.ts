@@ -81,4 +81,6 @@ export const DEFAULT_SETTINGS = {
   vatRate: 20, iban: '', bic: '', quoteValidityDays: 30,
   paymentTerms: '30 % d’acompte à la signature, solde à la mise en ligne. Abonnements payables mensuellement.',
   quoteNotes: 'Délai indicatif : 2 à 3 semaines après réception de vos contenus.',
+  invoiceDueDays: 30,
+  invoiceNotes: 'En cas de retard de paiement : pénalités au taux de 3 fois le taux d’intérêt légal et indemnité forfaitaire pour frais de recouvrement de 40 €. Pas d’escompte pour paiement anticipé.',
 }

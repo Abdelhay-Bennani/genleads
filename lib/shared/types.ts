@@ -1,6 +1,8 @@
 /** Nom affiché d'un utilisateur (sert pour l'assignation et le journal). */
 export type Member = string
 
+import type { ModuleId } from './modules'
+
 export type Role = 'super_admin' | 'admin'
 export const ROLE_LABEL: Record<Role, string> = { super_admin: 'Super Admin', admin: 'Admin' }
 
@@ -12,6 +14,8 @@ export interface PublicUser {
   active: boolean
   createdAt: string
   lastLoginAt: string | null
+  /** Modules retirés à cet Admin par le Super Admin (sans effet sur un Super Admin). */
+  disabledModules: ModuleId[]
 }
 
 export type Status = 'a_qualifier' | 'a_contacter' | 'r1' | 'devis' | 'gagne' | 'perdu'
@@ -125,6 +129,8 @@ export interface WebsiteTemplate {
   suggestedPackIds: string[]
   status: 'active' | 'archived'
   coverImageId: string | null
+  /** Site HTML importé et hébergé par le CRM (null : démo externe ou aucune). */
+  site: { files: number; size: number } | null
   createdAt: string
   updatedAt: string
 }
@@ -174,6 +180,10 @@ export interface AgencySettings {
   quoteValidityDays: number
   paymentTerms: string
   quoteNotes: string
+  /** Délai de paiement des factures, en jours. */
+  invoiceDueDays: number
+  /** Mentions obligatoires en bas des factures (pénalités de retard…). */
+  invoiceNotes: string
 }
 
 /* ------------------------------------------------ Devis */
@@ -213,6 +223,58 @@ export interface Quote {
   createdBy: string
   createdAt: string
   updatedAt: string
+}
+
+/* ------------------------------------------------ Factures et paiements */
+
+export type InvoiceKind = 'facture' | 'avoir'
+export type InvoiceType = 'totale' | 'acompte' | 'solde' | 'mensualite' | 'libre' | 'avoir'
+export type InvoiceStatus = 'emise' | 'envoyee' | 'payee' | 'annulee'
+
+export interface InvoiceLine {
+  name: string
+  description: string
+  quantity: number
+  /** Prix unitaire HT (négatif pour une remise ou un acompte déduit). */
+  unitPrice: number
+}
+
+export interface Invoice {
+  id: string
+  /** Numéro légal, continu par année : FAC-2026-001 ou AV-2026-001 */
+  number: string
+  kind: InvoiceKind
+  type: InvoiceType
+  quoteId: string | null
+  leadId: string | null
+  creditedInvoiceId: string | null
+  /** Mois facturé d'une mensualité : AAAA-MM */
+  period: string | null
+  status: InvoiceStatus
+  client: QuoteClient
+  lines: InvoiceLine[]
+  vatRate: number
+  issueDate: string // YYYY-MM-DD
+  dueDate: string // YYYY-MM-DD
+  paymentTerms: string
+  notes: string
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type PaymentMethod = 'virement' | 'carte' | 'cheque' | 'especes' | 'prelevement' | 'autre'
+
+export interface Payment {
+  id: string
+  invoiceId: string
+  amount: number
+  date: string // YYYY-MM-DD
+  method: PaymentMethod
+  reference: string
+  notes: string
+  createdBy: string
+  createdAt: string
 }
 
 export interface TemplateData {

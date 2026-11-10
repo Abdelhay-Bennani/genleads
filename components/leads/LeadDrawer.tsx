@@ -1,7 +1,7 @@
 'use client'
 import {
   AlarmRounded, CallRounded, CheckRounded, ContentCopyRounded, DeleteOutlineRounded, DescriptionOutlined, DesktopWindowsOutlined, EmailOutlined,
-  EventRounded, LanguageRounded, LinkRounded, NotesRounded, OpenInNewRounded, PictureAsPdfOutlined, PlaceOutlined, SendRounded, SlideshowRounded, SmsOutlined, StarRounded,
+  EventRounded, LanguageRounded, LinkRounded, NotesRounded, OpenInNewRounded, PictureAsPdfOutlined, PlaceOutlined, ReceiptLongOutlined, SendRounded, SlideshowRounded, SmsOutlined, StarRounded,
 } from '@mui/icons-material'
 import CloseRounded from '@mui/icons-material/CloseRounded'
 import {
@@ -11,17 +11,19 @@ import {
 import { useMemo, useState } from 'react'
 import { imgUrl } from '@/lib/client/images'
 import { useStore } from '@/lib/client/store'
-import { suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
+import { safeHref, suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
 import { NEEDS, PACK_CATEGORIES, STATUSES } from '@/lib/shared/data'
 import type { InteractionType, Prospect } from '@/lib/shared/types'
-import { addDays, ensureHttp, eur, fmtDate, fmtDateTime, followState, mapsUrl, quote, telHref, todayISO, uid } from '@/lib/shared/utils'
+import { addDays, ensureHttp, eur, eur2, fmtDate, fmtDateLong, fmtDateTime, followState, INVOICE_TYPE, invoiceTotals, mapsUrl, quote, telHref, todayISO, uid } from '@/lib/shared/utils'
+import { InvoiceActions, InvoiceStateChip } from '../invoice/InvoiceBits'
+import { InvoiceDialog } from '../invoice/InvoiceDialog'
 import { QuoteDialog } from '../quote/QuoteDialog'
 import { QuoteList } from '../quote/QuoteList'
 import { PresentationRow } from '../templates/PresentationRow'
 import { usePresenter } from '../templates/PresenterContext'
 import { SectionLabel, UserAvatar } from '../ui'
 
-export type LeadTab = 'infos' | 'journal' | 'devis' | 'maquettes'
+export type LeadTab = 'infos' | 'journal' | 'devis' | 'factures' | 'maquettes'
 const TYPES: { id: InteractionType; icon: typeof CallRounded }[] = [
   { id: 'Appel', icon: CallRounded }, { id: 'Email', icon: EmailOutlined }, { id: 'SMS', icon: SmsOutlined }, { id: 'RDV', icon: EventRounded }, { id: 'Note', icon: NotesRounded },
 ]
@@ -34,10 +36,12 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
   const isNew = !!initialDraft
   const [draft, setDraft] = useState<Prospect | null>(initialDraft)
   const p = isNew ? draft : store.prospects.find((x) => x.id === id) ?? null
-  const [tab, setTab] = useState<LeadTab>(initialTab)
+  const allowed: Record<LeadTab, boolean> = { infos: true, journal: true, devis: store.can('devis'), factures: store.can('factures', 'paiements'), maquettes: store.can('maquettes') }
+  const [tab, setTab] = useState<LeadTab>(allowed[initialTab] ? initialTab : 'infos')
   const [confirmDel, setConfirmDel] = useState(false)
   if (!p) return null
-  const patch = (ch: Partial<Prospect>) => (isNew ? setDraft({ ...p, ...ch }) : store.updateProspect(p.id, ch))
+  // Mise à jour fonctionnelle : deux appels successifs (journal + relance) ne s'écrasent pas
+  const patch = (ch: Partial<Prospect>) => (isNew ? setDraft((d) => (d ? { ...d, ...ch } : d)) : store.updateProspect(p.id, ch))
   const fs = followState(p)
   const create = () => { if (p.company.trim()) { store.saveProspect(p); onCreated(p.id) } }
 
@@ -65,7 +69,7 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
           <Button size="small" variant="outlined" startIcon={<EmailOutlined />} href={p.email ? `mailto:${p.email}` : '#'} disabled={!p.email}>Email</Button>
           <Button size="small" variant="outlined" startIcon={<LanguageRounded />} href={p.url ? ensureHttp(p.url) : '#'} target="_blank" disabled={!p.url}>Site</Button>
           <Button size="small" variant="outlined" startIcon={<PlaceOutlined />} href={mapsUrl(`${p.company} ${p.city}`)} target="_blank">Maps</Button>
-          <Button size="small" variant="outlined" startIcon={<DesktopWindowsOutlined />} disabled={isNew} onClick={() => presenter.share({ prospectId: p.id })}>Maquettes</Button>
+          {allowed.maquettes && <Button size="small" variant="outlined" startIcon={<DesktopWindowsOutlined />} disabled={isNew} onClick={() => presenter.share({ prospectId: p.id })}>Maquettes</Button>}
         </Stack>
         <Alert icon={<AlarmRounded fontSize="small" />} severity={fs === 'overdue' ? 'error' : fs === 'today' ? 'warning' : 'info'} variant="outlined"
           sx={{ mt: 1.5, py: 0.25, alignItems: 'center', '& .MuiAlert-message': { width: '100%' } }}>
@@ -83,14 +87,16 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
       <Tabs value={tab} onChange={(_e, v) => setTab(v)} sx={{ px: { xs: 1, sm: 2 }, borderBottom: 1, borderColor: 'divider' }} variant="scrollable">
         <Tab value="infos" label="Infos" />
         <Tab value="journal" label={`Journal (${p.interactions.length})`} />
-        <Tab value="devis" label="Devis" />
-        <Tab value="maquettes" label="Maquettes" />
+        {allowed.devis && <Tab value="devis" label="Devis" />}
+        {allowed.factures && <Tab value="factures" label="Factures" />}
+        {allowed.maquettes && <Tab value="maquettes" label="Maquettes" />}
       </Tabs>
 
       <Box sx={{ flex: 1, overflowY: 'auto', px: { xs: 2, sm: 3 }, py: 2.5 }}>
         {tab === 'infos' && <InfosTab p={p} patch={patch} />}
         {tab === 'journal' && <JournalTab p={p} isNew={isNew} patch={patch} />}
         {tab === 'devis' && <DevisTab p={p} patch={patch} isNew={isNew} />}
+        {tab === 'factures' && <FacturesTab p={p} isNew={isNew} />}
         {tab === 'maquettes' && <MaquettesTab p={p} isNew={isNew} goDevis={() => setTab('devis')} />}
       </Box>
 
@@ -243,7 +249,7 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
       parts.push(`Base graphique retenue : « ${tpl.name} » (${tpl.siteType}).`)
       if (tpl.description || tpl.shortDescription) parts.push(tpl.description || tpl.shortDescription)
       if (tpl.features.length) parts.push(`Inclus : ${tpl.features.join(', ')}.`)
-      if (tpl.demoUrl) parts.push(`Aperçu en ligne : ${tpl.demoUrl}`)
+      if (tpl.demoUrl) parts.push(`Aperçu en ligne : ${store.demoLink(tpl.demoUrl)}`)
       parts.push('')
     }
     if (q.oneShotRaw) {
@@ -253,7 +259,7 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
     if (q.mrr) parts.push(`Abonnement mensuel : ${eur(q.mrr)} HT / mois (sans engagement au-delà de 12 mois)`)
     parts.push('', 'Délai indicatif : 2 à 3 semaines après réception de vos contenus.', 'Je reste disponible pour en discuter par téléphone.', '', 'Bien cordialement,', store.me.name)
     return parts.join('\n')
-  }, [q, p, store.me.name, tpl])
+  }, [q, p, store, tpl])
 
   const markSent = () => {
     patch({ status: 'devis', nextFollowUp: addDays(todayISO(), 3) })
@@ -332,6 +338,44 @@ function DevisTab({ p, patch, isNew }: { p: Prospect; patch: (c: Partial<Prospec
   )
 }
 
+/** Factures, encaissements et reste dû de ce client. */
+function FacturesTab({ p, isNew }: { p: Prospect; isNew: boolean }) {
+  const store = useStore()
+  const [creating, setCreating] = useState(false)
+  if (isNew) return <Typography color="text.secondary" align="center" sx={{ py: 4 }}>Créez d'abord le prospect.</Typography>
+  const list = store.invoices.filter((i) => i.leadId === p.id)
+  const live = list.filter((i) => i.kind === 'facture' && i.status !== 'annulee')
+  const billed = live.reduce((t, i) => t + invoiceTotals(i).ttc, 0)
+  const paid = live.reduce((t, i) => t + store.paidOf(i.id), 0)
+  return (
+    <Stack spacing={2.5}>
+      <Grid container spacing={1.5}>
+        {[['Facturé', billed], ['Encaissé', paid], ['Reste dû', Math.max(0, billed - paid)]].map(([l, v]) => (
+          <Grid key={l as string} size={4}><Card sx={{ p: 1.75 }}><Typography variant="caption" color="text.secondary">{l}</Typography><Typography variant="h6">{eur2(v as number)}</Typography></Card></Grid>
+        ))}
+      </Grid>
+      {store.can('factures') && <Box><Button variant="contained" size="small" startIcon={<ReceiptLongOutlined />} onClick={() => setCreating(true)}>Nouvelle facture</Button></Box>}
+      {list.length ? (
+        <Card>
+          {list.map((i, n) => (
+            <Box key={i.id}>
+              {n > 0 && <Divider />}
+              <Stack direction="row" spacing={1.5} sx={{ p: 1.5, alignItems: 'center' }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}><Typography variant="body2" sx={{ fontWeight: 600 }}>{i.number}</Typography><InvoiceStateChip i={i} /></Stack>
+                  <Typography variant="caption" color="text.secondary">{INVOICE_TYPE[i.type]} · {fmtDateLong(i.issueDate)} · {eur2(invoiceTotals(i).ttc)}</Typography>
+                </Box>
+                <InvoiceActions i={i} />
+              </Stack>
+            </Box>
+          ))}
+        </Card>
+      ) : <Typography variant="body2" color="text.secondary">Aucune facture pour ce client.</Typography>}
+      {creating && <InvoiceDialog lead={p} onClose={() => setCreating(false)} />}
+    </Stack>
+  )
+}
+
 function MaquettesTab({ p, isNew, goDevis }: { p: Prospect; isNew: boolean; goDevis: () => void }) {
   const store = useStore()
   const presenter = usePresenter()
@@ -357,7 +401,7 @@ function MaquettesTab({ p, isNew, goDevis }: { p: Prospect; isNew: boolean; goDe
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><StarRounded sx={{ color: '#5539d9', fontSize: 18 }} /><Typography sx={{ fontWeight: 600 }}>{tpl.name}</Typography></Stack>
                 <Typography variant="caption" color="text.secondary">{store.categoryName(tpl.categoryId)} · {tpl.siteType}</Typography>
-                {tpl.demoUrl && <Box><Button size="small" href={tpl.demoUrl} target="_blank" startIcon={<OpenInNewRounded />} sx={{ px: 0 }}>Voir la démo</Button></Box>}
+                {safeHref(tpl.demoUrl) && <Box><Button size="small" href={safeHref(tpl.demoUrl)!} target="_blank" startIcon={<OpenInNewRounded />} sx={{ px: 0 }}>Voir la démo</Button></Box>}
               </Box>
               <Button variant="contained" size="small" startIcon={<DescriptionOutlined />} onClick={() => { apply(p, tpl); goDevis() }}>Créer le devis</Button>
             </Stack>

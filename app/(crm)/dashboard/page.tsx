@@ -126,8 +126,8 @@ export default function DashboardPage() {
       <PageHeader title="Dashboard" subtitle={new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         actions={
           <>
-            <Button variant="contained" size="large" startIcon={<AddRounded />} onClick={() => drawer.create()}>Nouveau lead</Button>
-            <Button variant="outlined" size="large" startIcon={<TravelExploreRounded />} component={Link} href="/prospects">Trouver des prospects</Button>
+            {store.can('leads', 'prospects') && <Button variant="contained" size="large" startIcon={<AddRounded />} onClick={() => drawer.create()}>Nouveau lead</Button>}
+            {store.can('prospects') && <Button variant="outlined" size="large" startIcon={<TravelExploreRounded />} component={Link} href="/prospects">Trouver des prospects</Button>}
             {store.members.length > 1 && (
               <ToggleButtonGroup size="small" exclusive value={who} onChange={(_e, v) => v && setWho(v)}>
                 <ToggleButton value="all" sx={{ px: 2 }}>Tous</ToggleButton>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                       </>
                     ) : <Typography variant="body2" color="text.secondary">Aucune session d’appels planifiée.</Typography>}
                   </Box>
-                  <Button variant="contained" size="large" fullWidth startIcon={<CallRounded />} component={Link} href={m.nextSession ? `/prospects?session=${encodeURIComponent(m.nextSession)}` : '/prospects'}>{m.nextSession ? 'Lancer les appels' : 'Voir les prospects'}</Button>
+                  {store.can('prospects') && <Button variant="contained" size="large" fullWidth startIcon={<CallRounded />} component={Link} href={m.nextSession ? `/prospects?session=${encodeURIComponent(m.nextSession)}` : '/prospects'}>{m.nextSession ? 'Lancer les appels' : 'Voir les prospects'}</Button>}
                 </CardContent>
               </Card>
             </Grid>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
               <CardContent sx={{ pb: 0 }}>
                 <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="h6">Relances</Typography>
-                  <Button variant="outlined" size="small" startIcon={<AddRounded />} onClick={() => drawer.create()}>Nouveau</Button>
+                  {store.can('leads', 'prospects') && <Button variant="outlined" size="small" startIcon={<AddRounded />} onClick={() => drawer.create()}>Nouveau</Button>}
                 </Stack>
               </CardContent>
               {m.follow.length ? (
@@ -225,7 +225,7 @@ export default function DashboardPage() {
           </Stack>
         </Grid>
 
-        <Grid size={12}>
+        {store.can('maquettes', 'presentations') && <Grid size={12}>
           <Card>
             <CardContent>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}>
@@ -241,7 +241,7 @@ export default function DashboardPage() {
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
+        </Grid>}
       </Grid>
     </>
   )

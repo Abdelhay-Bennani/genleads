@@ -1,6 +1,6 @@
 'use client'
 import {
-  AddPhotoAlternateOutlined, AddRounded, ArchiveOutlined, ArrowBackRounded, ArrowForwardRounded, CategoryOutlined, CheckRounded, CloseRounded,
+  AddPhotoAlternateOutlined, AddRounded, ArchiveOutlined, ArrowBackRounded, ArrowForwardRounded, CategoryOutlined, CheckRounded, CloseRounded, CodeRounded,
   DeleteOutlineRounded, DescriptionOutlined, EditOutlined, GridViewRounded, OpenInNewRounded, SearchRounded, ShareOutlined, SlideshowRounded,
   StarBorderRounded, StarRounded, ViewListRounded,
 } from '@mui/icons-material'
@@ -11,10 +11,13 @@ import {
 import { useMemo, useRef, useState } from 'react'
 import { useLeadDrawer } from '@/components/shell/LeadDrawerContext'
 import { usePresenter } from '@/components/templates/PresenterContext'
+import { SitePreview } from '@/components/templates/SitePreview'
+import { SiteDropZone, SiteImporter, useSiteDrop } from '@/components/templates/SiteImporter'
 import { EmptyState, PageHeader, SectionLabel } from '@/components/ui'
 import { imgUrl, uploadScreenshot } from '@/lib/client/images'
+import { removeSite, type PickedSite, uploadSite } from '@/lib/client/site'
 import { useStore } from '@/lib/client/store'
-import { safeHref, suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
+import { isHostedSite, safeHref, suggestPacks, useApplyTemplateToQuote } from '@/lib/client/templates'
 import type { ImageKind, TemplateImage, WebsiteTemplate } from '@/lib/shared/types'
 import { fmtDate, fmtDateTime, normalize, uid } from '@/lib/shared/utils'
 
@@ -34,6 +37,9 @@ export default function MaquettesPage() {
   const [editing, setEditing] = useState<WebsiteTemplate | null>(null)
   const [cats, setCats] = useState(false)
   const [quoteFor, setQuoteFor] = useState<WebsiteTemplate | null>(null)
+  const [droppedSite, setDroppedSite] = useState<PickedSite | null>(null)
+  const closeEditor = () => { setEditing(null); setDroppedSite(null) }
+  const siteDrop = useSiteDrop((site) => { setDroppedSite(site); setEditing({ ...blank(), name: site.title, technologies: ['HTML', 'CSS', 'JavaScript'] }) })
 
   const list = useMemo(() => {
     const nq = normalize(q)
@@ -44,7 +50,7 @@ export default function MaquettesPage() {
 
   const blank = (): WebsiteTemplate => {
     const now = new Date().toISOString()
-    return { id: uid(), name: '', categoryId: cat || store.templateCategories[0]?.id || null, siteType: 'Site vitrine', shortDescription: '', description: '', features: [], technologies: [], tags: [], demoUrl: '', demoUrlMobile: '', suggestedPackIds: [], status: 'active', coverImageId: null, createdAt: now, updatedAt: now }
+    return { id: uid(), name: '', categoryId: cat || store.templateCategories[0]?.id || null, siteType: 'Site vitrine', shortDescription: '', description: '', features: [], technologies: [], tags: [], demoUrl: '', demoUrlMobile: '', suggestedPackIds: [], status: 'active', coverImageId: null, site: null, createdAt: now, updatedAt: now }
   }
 
   const Actions = ({ t }: { t: WebsiteTemplate }) => (
@@ -65,6 +71,8 @@ export default function MaquettesPage() {
           <Button variant="outlined" startIcon={<CategoryOutlined />} onClick={() => setCats(true)}>Catégories</Button>
           <Button variant="contained" startIcon={<AddRounded />} onClick={() => setEditing(blank())}>Nouvelle maquette</Button>
         </>} />
+
+      <SiteDropZone drop={siteDrop} />
 
       <Card sx={{ p: 1.5, mb: 2.5 }}>
         <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1.25} sx={{ alignItems: { lg: 'center' } }}>
@@ -97,9 +105,11 @@ export default function MaquettesPage() {
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', opacity: t.status === 'archived' ? 0.6 : 1, transition: '0.2s', '&:hover': { borderColor: 'primary.main' } }}>
                   <CardActionArea onClick={() => setEditing(t)} sx={{ position: 'relative', aspectRatio: '16 / 10', bgcolor: 'action.hover', overflow: 'hidden' }}>
                     {cover ? <Box component="img" src={imgUrl(cover.thumb)} alt={t.name} loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-                      : <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', color: 'text.disabled' }}><AddPhotoAlternateOutlined /></Box>}
+                      : isHostedSite(t.demoUrl) ? <SitePreview url={t.demoUrl} title={t.name} />
+                        : <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', color: 'text.disabled' }}><AddPhotoAlternateOutlined /></Box>}
                     <Chip size="small" label={store.categoryName(t.categoryId)} sx={{ position: 'absolute', top: 10, left: 10, bgcolor: 'rgba(0,0,0,0.6)', color: '#fff' }} />
                     {t.status === 'archived' && <Chip size="small" label="Archivée" sx={{ position: 'absolute', top: 10, right: 10 }} />}
+                    {t.site && t.status !== 'archived' && <Chip size="small" icon={<CodeRounded />} label="Site HTML" sx={{ position: 'absolute', top: 10, right: 10, bgcolor: 'rgba(0,0,0,0.6)', color: '#fff', '& .MuiChip-icon': { color: '#fff' } }} />}
                     {chosen > 0 && <Chip size="small" color="success" icon={<StarRounded />} label={`${chosen} choix client`} sx={{ position: 'absolute', bottom: 10, right: 10 }} />}
                   </CardActionArea>
                   <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -134,7 +144,7 @@ export default function MaquettesPage() {
         </Card>
       )}
 
-      {editing && <TemplateEditor key={editing.id} template={editing} onClose={() => setEditing(null)} />}
+      {editing && <TemplateEditor key={editing.id} template={editing} initialSite={droppedSite} onClose={closeEditor} />}
       {cats && <CategoriesDialog onClose={() => setCats(false)} />}
       {quoteFor && <QuoteDialog t={quoteFor} onClose={() => setQuoteFor(null)} onDone={(pid) => { setQuoteFor(null); drawer.open(pid, 'devis') }} />}
     </>
@@ -143,7 +153,7 @@ export default function MaquettesPage() {
 
 type DraftImage = Omit<TemplateImage, 'templateId' | 'order'>
 
-function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onClose: () => void }) {
+function TemplateEditor({ template, initialSite, onClose }: { template: WebsiteTemplate; initialSite: PickedSite | null; onClose: () => void }) {
   const store = useStore()
   const isNew = !store.templates.some((t) => t.id === template.id)
   const [t, setT] = useState(template)
@@ -157,6 +167,10 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
   const [confirmDel, setConfirmDel] = useState(false)
   const [newCat, setNewCat] = useState<string | null>(null)
   const [drag, setDrag] = useState(false)
+  const [pendingSite, setPendingSite] = useState<PickedSite | null>(initialSite)
+  const [dropSite, setDropSite] = useState(false)
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
+  const existingSite = dropSite ? null : store.templates.find((x) => x.id === template.id)?.site ?? null
   const fileRef = useRef<HTMLInputElement>(null)
   const sitePacks = store.packs.filter((k) => k.category === 'site' && k.active)
   const cover = t.coverImageId ?? images[0]?.id
@@ -182,8 +196,16 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
     setBusy(true); setErr(null)
     try {
       await store.saveTemplate({ ...t, features: split(features, /\n/), technologies: split(techs, /,/), tags: split(tags, /,/) }, images)
+      if (pendingSite) {
+        setProgress({ done: 0, total: pendingSite.files.length })
+        await uploadSite(t.id, pendingSite.files, (done, total) => setProgress({ done, total }))
+        await store.refresh(true)
+      } else if (dropSite) {
+        await removeSite(t.id)
+        await store.refresh(true)
+      }
       store.notify(isNew ? 'Maquette ajoutée' : 'Maquette enregistrée'); onClose()
-    } catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
+    } catch (e) { setErr((e as Error).message) } finally { setBusy(false); setProgress(null) }
   }
   const addCategory = async () => {
     if (!newCat?.trim()) return
@@ -195,6 +217,7 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
       <DialogTitle>{isNew ? 'Nouvelle maquette' : `Modifier « ${template.name} »`}</DialogTitle>
       <DialogContent>
         <Stack spacing={2.5} sx={{ mt: 0.5 }}>
+          <SiteImporter pending={pendingSite} existing={existingSite} demoUrl={store.templates.find((x) => x.id === template.id)?.demoUrl ?? ''} progress={progress} onPick={(s) => { setPendingSite(s); setDropSite(false); if (!t.name.trim()) setT({ ...t, name: s.title }) }} onClear={() => setPendingSite(null)} onRemoveExisting={() => setDropSite(true)} />
           <Box>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
               <SectionLabel>Captures d'écran ({images.length}) — l'étoile désigne la couverture</SectionLabel>
@@ -250,7 +273,7 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
                 <ToggleButton value="archived" sx={{ gap: 0.75 }}><ArchiveOutlined fontSize="small" />Archivée</ToggleButton>
               </ToggleButtonGroup>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField label="URL de démonstration" value={t.demoUrl} onChange={(e) => setT({ ...t, demoUrl: e.target.value })} placeholder="https://demo.votre-agence.fr/plombier" /></Grid>
+            <Grid size={{ xs: 12, sm: 6 }}><TextField label="URL de démonstration" disabled={!!pendingSite || !!existingSite} value={pendingSite ? 'Site HTML importé' : t.demoUrl} onChange={(e) => setT({ ...t, demoUrl: e.target.value })} placeholder="https://demo.votre-agence.fr/plombier" /></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField label="URL démo mobile (si différente)" value={t.demoUrlMobile} onChange={(e) => setT({ ...t, demoUrlMobile: e.target.value })} /></Grid>
             <Grid size={12}><TextField label="Description courte (cartes)" value={t.shortDescription} onChange={(e) => setT({ ...t, shortDescription: e.target.value })} slotProps={{ htmlInput: { maxLength: 220 } }} /></Grid>
             <Grid size={12}><TextField label="Description complète" multiline minRows={3} value={t.description} onChange={(e) => setT({ ...t, description: e.target.value })} placeholder="Ambiance, cible, pages incluses…" /></Grid>
@@ -278,7 +301,7 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
           ? <Button color="error" variant="outlined" sx={{ mr: 'auto' }} onClick={async () => { try { await store.deleteTemplate(t.id); store.notify('Maquette supprimée'); onClose() } catch (e) { setErr((e as Error).message) } }}>Confirmer la suppression</Button>
           : <Button color="error" startIcon={<DeleteOutlineRounded />} sx={{ mr: 'auto' }} onClick={() => setConfirmDel(true)}>Supprimer</Button>)}
         <Button onClick={onClose}>Annuler</Button>
-        <Button variant="contained" onClick={save} disabled={busy || uploading > 0} startIcon={busy || uploading > 0 ? <CircularProgress size={14} color="inherit" /> : undefined}>{uploading > 0 ? `Envoi des images (${uploading})…` : 'Enregistrer'}</Button>
+        <Button variant="contained" onClick={save} disabled={busy || uploading > 0} startIcon={busy || uploading > 0 ? <CircularProgress size={14} color="inherit" /> : undefined}>{uploading > 0 ? `Envoi des images (${uploading})…` : progress ? `Envoi du site (${progress.done}/${progress.total})…` : 'Enregistrer'}</Button>
       </DialogActions>
     </Dialog>
   )

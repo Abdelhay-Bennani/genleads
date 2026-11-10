@@ -19,7 +19,7 @@ export function QuoteDialog({ lead, packIds, discount, onClose, onCreated }: {
   const s = store.settings
   const [client, setClient] = useState<QuoteClient>({
     company: lead?.company ?? '', contact: lead?.contact ?? '', email: lead?.email ?? '', phone: lead?.phone?.split(',')[0]?.trim() ?? '',
-    address: '', postalCode: lead?.postalCode ?? '', city: lead?.city ?? '',
+    address: lead?.address ?? '', postalCode: lead?.postalCode ?? '', city: lead?.city ?? '',
   })
   const [validityDays, setValidityDays] = useState(s.quoteValidityDays || 30)
   const [notes, setNotes] = useState(s.quoteNotes)

@@ -1,5 +1,5 @@
 import { db } from '@/lib/server/db'
-import { bad, body, requireUser, route } from '@/lib/server/http'
+import { bad, body, requireModule, route } from '@/lib/server/http'
 import { addInteraction, getSettings, toQuote, uid } from '@/lib/server/repo'
 import type { QuoteClient, QuoteLine } from '@/lib/shared/types'
 import { eur, quoteTotals } from '@/lib/shared/utils'
@@ -12,7 +12,7 @@ const addDays = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n
  * et sont figés dans le devis : modifier un pack ensuite ne change pas les devis déjà émis.
  */
 export const POST = route(async (req: Request) => {
-  const me = await requireUser()
+  const me = await requireModule('devis')
   const b = await body<{ leadId?: string | null; packIds?: string[]; discount?: number; client?: Partial<QuoteClient>; validityDays?: number; notes?: string; paymentTerms?: string }>(req)
   const packIds = Array.isArray(b.packIds) ? b.packIds.map(String).slice(0, 30) : []
   if (!packIds.length) throw bad('Choisissez au moins une prestation.')

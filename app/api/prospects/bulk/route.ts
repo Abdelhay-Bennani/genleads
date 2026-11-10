@@ -1,10 +1,10 @@
 import { db } from '@/lib/server/db'
-import { body, requireUser, route } from '@/lib/server/http'
+import { body, requireModule, route } from '@/lib/server/http'
 import { cleanLead, insertLead } from '@/lib/server/repo'
 import type { Prospect } from '@/lib/shared/types'
 
 export const POST = route(async (req: Request) => {
-  await requireUser()
+  await requireModule('leads', 'prospects')
   const list = await body<unknown[]>(req)
   const sql = await db()
   let added = 0

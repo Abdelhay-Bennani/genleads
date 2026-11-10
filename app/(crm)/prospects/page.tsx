@@ -8,7 +8,7 @@ import { EmptyState, PageHeader, StatTile, StatusChip } from '@/components/ui'
 import { useStore } from '@/lib/client/store'
 import { STATUSES } from '@/lib/shared/data'
 import type { Prospect, Status } from '@/lib/shared/types'
-import { ensureHttp, followState, googleUrl, isClosed, isSiteUnverified, mapsUrl, normalize, telHref } from '@/lib/shared/utils'
+import { ensureHttp, followState, googleUrl, isClosed, isSiteUnverified, mapsUrl, normalize, SITE_UNVERIFIED, telHref } from '@/lib/shared/utils'
 
 const EMPTY = { q: '', trade: '', city: '', department: '', session: '', status: 'open', phone: 'all', site: 'none' }
 const uniq = (l: (string | undefined)[]) => [...new Set(l.map((x) => (x ?? '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'))
@@ -47,7 +47,8 @@ export default function ProspectsPage() {
       if (f.status === 'open' ? isClosed(p) : f.status && p.status !== f.status) return false
       if (f.phone === 'with' && !p.phone) return false
       if (f.phone === 'without' && p.phone) return false
-      if (f.site === 'none' && p.hasWebsite) return false
+      // « Sans site » exclut les fiches à vérifier, sauf si on demande justement cette session
+      if (f.site === 'none' && (p.hasWebsite || (isSiteUnverified(p) && f.session !== SITE_UNVERIFIED))) return false
       return true
     })
   }, [store.prospects, f])

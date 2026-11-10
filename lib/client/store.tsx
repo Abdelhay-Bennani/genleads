@@ -2,19 +2,20 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api, ApiError } from './api'
 import { useAuth } from './auth'
-import type { AgencySettings, AppData, Interaction, KeywordQuery, Member, Pack, Presentation, Prospect, PublicUser, Quote, QuoteClient, QuoteData, QuoteStatus, Role, TemplateData, TemplateImage, WebsiteTemplate } from '../shared/types'
-import { uid } from '../shared/utils'
+import { hasModule, type ModuleId } from '../shared/modules'
+import type { AgencySettings, AppData, Interaction, Invoice, KeywordQuery, Member, Pack, Payment, PaymentMethod, Presentation, Prospect, PublicUser, Quote, QuoteClient, QuoteData, QuoteStatus, Role, TemplateData, TemplateImage, WebsiteTemplate } from '../shared/types'
+import { round2, uid } from '../shared/utils'
 
-interface Data extends AppData, TemplateData, QuoteData { users: PublicUser[] }
+interface Data extends AppData, TemplateData, QuoteData { users: PublicUser[]; invoices: Invoice[]; payments: Payment[] }
 
 export interface NewQuote { leadId: string | null; packIds: string[]; discount: number; client: QuoteClient; validityDays: number; notes: string; paymentTerms: string }
 
 const EMPTY: Data = {
-  prospects: [], packs: [], keywords: [], users: [], quotes: [],
+  prospects: [], packs: [], keywords: [], users: [], quotes: [], invoices: [], payments: [],
   templateCategories: [], templates: [], templateImages: [], templatePresentations: [], templatePresentationItems: [], templateClientSelections: [],
   settings: {
     agencyName: 'AgenceFlow', agencyTagline: '', logoFile: null, publicBaseUrl: '', contactEmail: '', contactPhone: '',
-    legalName: '', address: '', postalCode: '', city: '', siret: '', vatNumber: '', vatRate: 20, iban: '', bic: '', quoteValidityDays: 30, paymentTerms: '', quoteNotes: '',
+    legalName: '', address: '', postalCode: '', city: '', siret: '', vatNumber: '', vatRate: 20, iban: '', bic: '', quoteValidityDays: 30, paymentTerms: '', quoteNotes: '', invoiceDueDays: 30, invoiceNotes: '',
   },
   siteTypes: [],
 }
@@ -22,6 +23,8 @@ const EMPTY: Data = {
 interface Store extends Data {
   me: PublicUser
   isSuper: boolean
+  /** Vrai si au moins un des modules est ouvert à l'utilisateur. */
+  can: (...modules: ModuleId[]) => boolean
   /** Noms des utilisateurs actifs (pour l'assignation). */
   members: Member[]
   loaded: boolean
@@ -35,8 +38,8 @@ interface Store extends Data {
   replaceAll: (d: AppData) => Promise<void>
   resetAll: () => Promise<void>
   refresh: (force?: boolean) => Promise<void>
-  createUser: (u: { name: string; username: string; password: string; role: Role }) => Promise<void>
-  updateUser: (id: string, patch: Partial<{ name: string; username: string; role: Role; active: boolean; password: string }>) => Promise<void>
+  createUser: (u: { name: string; username: string; password: string; role: Role; disabledModules?: ModuleId[] }) => Promise<void>
+  updateUser: (id: string, patch: Partial<{ name: string; username: string; role: Role; active: boolean; password: string; disabledModules: ModuleId[] }>) => Promise<void>
   deleteUser: (id: string) => Promise<void>
   /* Maquettes */
   saveTemplate: (t: WebsiteTemplate, images: Omit<TemplateImage, 'templateId' | 'order'>[]) => Promise<void>
@@ -52,7 +55,17 @@ interface Store extends Data {
   /* Devis */
   createQuote: (q: NewQuote) => Promise<Quote>
   setQuoteStatus: (id: string, status: QuoteStatus) => Promise<void>
+  /* Factures et paiements */
+  createInvoice: (b: Record<string, unknown>) => Promise<Invoice>
+  createRecurringInvoices: (period: string, quoteIds: string[]) => Promise<Invoice[]>
+  markInvoiceSent: (id: string) => Promise<void>
+  cancelInvoice: (id: string) => Promise<Invoice>
+  addPayment: (p: { invoiceId: string; amount: number; date: string; method: PaymentMethod; reference: string; notes: string }) => Promise<void>
+  deletePayment: (id: string) => Promise<void>
+  paidOf: (invoiceId: string) => number
   presentationUrl: (p: Presentation) => string
+  /** Adresse complète d'une démo (les sites importés ont une adresse relative). */
+  demoLink: (url: string) => string
   imagesOf: (templateId: string) => TemplateImage[]
   coverOf: (t: WebsiteTemplate) => TemplateImage | undefined
   categoryName: (id: string | null) => string
@@ -92,9 +105,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setData({ ...EMPTY, ...d })
       setLoaded(true)
       const self = d.users.find((u) => u.id === me.id)
-      if (self && (self.name !== me.name || self.role !== me.role)) auth.setUser(self)
+      if (self && (self.name !== me.name || self.role !== me.role || self.disabledModules.join() !== me.disabledModules.join())) auth.setUser(self)
     } catch (e) { onErr(e) }
-  }, [onErr, me.id, me.name, me.role, auth])
+  }, [onErr, me.id, me.name, me.role, me.disabledModules, auth])
 
   // Chargement initial + synchronisation régulière (pour voir le travail de l'associé)
   useEffect(() => {
@@ -135,7 +148,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }))
     return {
       ...data,
-      me, isSuper: me.role === 'super_admin', loaded, toast, notify, refresh,
+      me, isSuper: me.role === 'super_admin', can: (...m) => hasModule(me, ...m), loaded, toast, notify, refresh,
       members: data.users.filter((u) => u.active).map((u) => u.name),
       saveProspect: (p) => {
         const stamped = { ...p, updatedAt: new Date().toISOString() }
@@ -200,7 +213,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
           prospects: d.prospects.map((p) => (p.id === r.leadId ? { ...p, status: leadStatus(p.status) } : p)),
         }))
       },
+      createInvoice: async (b) => {
+        const r = await api<Invoice>('POST', '/api/invoices', b)
+        setData((d) => ({ ...d, invoices: [r, ...d.invoices] }))
+        return r
+      },
+      createRecurringInvoices: async (period, quoteIds) => {
+        const r = await api<Invoice[]>('POST', '/api/invoices/recurring', { period, quoteIds })
+        setData((d) => ({ ...d, invoices: [...r, ...d.invoices] }))
+        return r
+      },
+      markInvoiceSent: async (id) => {
+        const { invoice } = await api<{ invoice: Invoice }>('PATCH', `/api/invoices/${id}`, { action: 'send' })
+        setData((d) => ({ ...d, invoices: d.invoices.map((x) => (x.id === id ? invoice : x)) }))
+      },
+      cancelInvoice: async (id) => {
+        const { invoice, avoir } = await api<{ invoice: Invoice; avoir: Invoice }>('PATCH', `/api/invoices/${id}`, { action: 'cancel' })
+        setData((d) => ({ ...d, invoices: [avoir, ...d.invoices.map((x) => (x.id === id ? invoice : x))] }))
+        return avoir
+      },
+      addPayment: async (p) => {
+        const r = await api<{ payment: Payment; invoice: Invoice }>('POST', '/api/payments', p)
+        setData((d) => ({ ...d, payments: [r.payment, ...d.payments], invoices: d.invoices.map((x) => (x.id === r.invoice.id ? r.invoice : x)) }))
+      },
+      deletePayment: async (id) => {
+        const r = await api<{ invoice: Invoice }>('DELETE', `/api/payments/${id}`)
+        setData((d) => ({ ...d, payments: d.payments.filter((x) => x.id !== id), invoices: d.invoices.map((x) => (x.id === r.invoice.id ? r.invoice : x)) }))
+      },
+      paidOf: (invoiceId) => round2(data.payments.filter((x) => x.invoiceId === invoiceId).reduce((t, x) => t + x.amount, 0)),
       presentationUrl: (p) => `${(data.settings.publicBaseUrl || window.location.origin).replace(/\/+$/, '')}/p/${p.token}`,
+      demoLink: (url) => (url.startsWith('/') ? `${(data.settings.publicBaseUrl || window.location.origin).replace(/\/+$/, '')}${url}` : url),
       imagesOf: (templateId) => data.templateImages.filter((i) => i.templateId === templateId).sort((a, b) => a.order - b.order),
       coverOf: (t) => data.templateImages.find((i) => i.id === t.coverImageId) ?? data.templateImages.filter((i) => i.templateId === t.id).sort((a, b) => a.order - b.order)[0],
       categoryName: (id) => data.templateCategories.find((c) => c.id === id)?.name ?? 'Sans catégorie',

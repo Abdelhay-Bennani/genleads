@@ -25,7 +25,12 @@ export const newProspect = (seed: Partial<Prospect> | undefined, user: string): 
 export function LeadDrawerProvider({ children }: { children: ReactNode }) {
   const store = useStore()
   const [state, setState] = useState<{ id: string | null; draft: Prospect | null; tab: LeadTab; key: number } | null>(null)
-  const open = useCallback((id: string, tab: LeadTab = 'infos') => setState({ id, draft: null, tab, key: Date.now() }), [])
+  const canOpen = store.can('leads', 'prospects', 'clients')
+  const { notify } = store
+  const open = useCallback((id: string, tab: LeadTab = 'infos') => {
+    if (!canOpen) { notify('La fiche lead n’est pas accessible avec vos modules actifs.', false); return }
+    setState({ id, draft: null, tab, key: Date.now() })
+  }, [canOpen, notify])
   const create = useCallback((seed?: Partial<Prospect>) => setState({ id: null, draft: newProspect(seed, store.me.name), tab: 'infos', key: Date.now() }), [store.me.name])
   return (
     <C.Provider value={{ open, create }}>

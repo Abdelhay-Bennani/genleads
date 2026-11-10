@@ -27,6 +27,8 @@ export const PUT = route(async (req: Request) => {
     quoteValidityDays: Math.round(n(b.quoteValidityDays, 1, 365, 30)),
     paymentTerms: s(b.paymentTerms, 1000),
     quoteNotes: s(b.quoteNotes, 2000),
+    invoiceDueDays: Math.round(n(b.invoiceDueDays, 0, 60, 30)), // 60 jours : plafond légal en France
+    invoiceNotes: s(b.invoiceNotes, 2000),
   }
   const sql = await db()
   await sql`insert into settings (key, value) values ('agency', ${sql.json(value)}) on conflict (key) do update set value = excluded.value`

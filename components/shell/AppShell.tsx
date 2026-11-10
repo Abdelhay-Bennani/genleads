@@ -1,22 +1,22 @@
 'use client'
-import { LogoutRounded, ManageAccountsOutlined, MenuRounded, SearchRounded } from '@mui/icons-material'
+import { LockOutlined, LogoutRounded, ManageAccountsOutlined, MenuRounded, SearchRounded } from '@mui/icons-material'
 import {
-  AppBar, Autocomplete, Box, Button, ButtonBase, Divider, Drawer, IconButton, InputAdornment, List, ListItemButton, ListItemIcon, ListItemText,
+  AppBar, Autocomplete, Box, Button, ButtonBase, Card, Divider, Drawer, IconButton, InputAdornment, List, ListItemButton, ListItemIcon, ListItemText,
   Menu, MenuItem, Stack, TextField, Toolbar, Typography,
 } from '@mui/material'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { ReactNode, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { ReactNode, useEffect, useState } from 'react'
 import { useAuth } from '@/lib/client/auth'
 import { useStore } from '@/lib/client/store'
 import { ROLE_LABEL } from '@/lib/shared/types'
 import { followState } from '@/lib/shared/utils'
-import { GlowBadge, UserAvatar } from '../ui'
+import { EmptyState, GlowBadge, UserAvatar } from '../ui'
 import { AccountDialog } from './AccountDialog'
 import { ModeToggle } from './AuthScreens'
 import { useLeadDrawer } from './LeadDrawerContext'
 import { Logo } from './Logo'
-import { NAV, titleFor } from './nav'
+import { ALL_NAV, NAV, titleFor } from './nav'
 
 const WIDTH = 268
 
@@ -55,7 +55,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     <Stack sx={{ height: '100%' }}>
       <Box sx={{ px: 3, py: 3 }}><Logo /></Box>
       <Box sx={{ flex: 1, overflowY: 'auto', px: 1.5 }}>
-        {NAV.map((section, si) => (
+        {NAV.map((s) => ({ ...s, items: s.items.filter((i) => !i.module || store.can(i.module)) })).filter((s) => s.items.length).map((section, si) => (
           <Box key={si} sx={{ pb: 2 }}>
             {section.title && <Typography variant="overline" color="text.secondary" sx={{ px: 1.5, display: 'block', mb: 0.25, fontSize: '0.68rem' }}>{section.title}</Typography>}
             <List dense disablePadding>
@@ -80,11 +80,13 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
           </Box>
         ))}
       </Box>
-      <Box sx={{ m: 1.5, p: 2, borderRadius: 4, bgcolor: 'primary.main', color: '#fff' }}>
-        <Typography sx={{ fontWeight: 600, lineHeight: 1.25 }}>{due ? `${due} appel${due > 1 ? 's' : ''} à faire` : 'Trouvez vos prochains clients'}</Typography>
-        <Typography variant="caption" sx={{ display: 'block', mt: 0.5, mb: 1.5, color: 'rgba(255,255,255,.85)' }}>Vos entreprises sans site web</Typography>
-        <Button fullWidth component={Link} href="/prospects" onClick={onNavigate} sx={{ bgcolor: '#fff', color: 'primary.main', '&:hover': { bgcolor: '#fff' } }}>Voir les prospects</Button>
-      </Box>
+      {store.can('prospects') && (
+        <Box sx={{ m: 1.5, p: 2, borderRadius: 4, bgcolor: 'primary.main', color: '#fff' }}>
+          <Typography sx={{ fontWeight: 600, lineHeight: 1.25 }}>{due ? `${due} appel${due > 1 ? 's' : ''} à faire` : 'Trouvez vos prochains clients'}</Typography>
+          <Typography variant="caption" sx={{ display: 'block', mt: 0.5, mb: 1.5, color: 'rgba(255,255,255,.85)' }}>Vos entreprises sans site web</Typography>
+          <Button fullWidth component={Link} href="/prospects" onClick={onNavigate} sx={{ bgcolor: '#fff', color: 'primary.main', '&:hover': { bgcolor: '#fff' } }}>Voir les prospects</Button>
+        </Box>
+      )}
     </Stack>
   )
 }
@@ -96,6 +98,7 @@ function QuickSearch() {
   return (
     <Autocomplete size="small" sx={{ width: 380, maxWidth: '45%', '& .MuiOutlinedInput-root': { borderRadius: 999, bgcolor: 'background.default' }, '& fieldset': { border: 'none' } }} value={value} blurOnSelect clearOnBlur
       options={store.prospects.map((p) => p.id)}
+      getOptionKey={(id) => id}
       getOptionLabel={(id) => store.prospects.find((p) => p.id === id)?.company ?? ''}
       renderOption={(props, id) => {
         const p = store.prospects.find((x) => x.id === id)!
@@ -112,14 +115,36 @@ function QuickSearch() {
 }
 
 function Header() {
+  const store = useStore()
   return (
     <Stack direction="row" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 2, px: 2.5, py: 1.5, borderRadius: '24px', bgcolor: 'background.paper' }}>
-      <QuickSearch />
+      {store.can('leads', 'prospects', 'clients') ? <QuickSearch /> : <span />}
       <Stack direction="row" spacing={2} sx={{ alignItems: 'center', minWidth: 0 }}>
         <ModeToggle />
         <AccountMenu />
       </Stack>
     </Stack>
+  )
+}
+
+/** Bloque l'affichage d'un module désactivé, même par adresse directe. */
+function ModuleGuard({ children }: { children: ReactNode }) {
+  const path = usePathname()
+  const router = useRouter()
+  const store = useStore()
+  const item = ALL_NAV.find((i) => path === i.href || path.startsWith(i.href + '/'))
+  const denied = !!item?.module && !store.can(item.module)
+  const first = ALL_NAV.find((i) => !i.module || store.can(i.module))
+  // Le Dashboard est la page d'accueil : on redirige vers le premier module ouvert.
+  useEffect(() => { if (denied && path === '/dashboard' && first) router.replace(first.href) }, [denied, path, first, router])
+  if (!denied) return <>{children}</>
+  return (
+    <Card>
+      <EmptyState icon={<LockOutlined />} title="Module désactivé">
+        Ce module n'est pas activé pour votre compte. Contactez le Super Admin pour y accéder.
+        {first && <Box sx={{ mt: 2 }}><Button variant="contained" component={Link} href={first.href}>Aller à {first.label}</Button></Box>}
+      </EmptyState>
+    </Card>
   )
 }
 
@@ -145,7 +170,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </AppBar>
         <Box component="main" sx={{ px: { xs: 2, md: 0 }, py: { xs: 2.5, md: 0 }, maxWidth: 1480, mx: 'auto' }}>
           <Header />
-          <Box sx={{ pt: { md: 1.5 }, px: { md: 1.5 }, pb: { md: 2 } }}>{children}</Box>
+          <Box sx={{ pt: { md: 1.5 }, px: { md: 1.5 }, pb: { md: 2 } }}><ModuleGuard>{children}</ModuleGuard></Box>
         </Box>
       </Box>
     </Box>

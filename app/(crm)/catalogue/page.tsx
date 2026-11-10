@@ -16,14 +16,14 @@ import { eur, uid } from '@/lib/shared/utils'
 
 /** Identité visuelle de chaque catégorie de packs. */
 const CAT: Record<PackCategory, { from: string; to: string; icon: ReactNode; tagline: string }> = {
-  site: { from: '#8b5cf6', to: '#6366f1', icon: <LanguageRounded />, tagline: 'Création et refonte de sites qui convertissent' },
-  seo: { from: '#06b6d4', to: '#10b981', icon: <TrendingUpRounded />, tagline: 'Être trouvé sur Google par les clients du coin' },
-  maintenance: { from: '#f59e0b', to: '#f43f5e', icon: <BuildCircleRounded />, tagline: 'Un site à jour, sauvegardé et sécurisé' },
+  site: { from: '#5539d9', to: '#5539d9', icon: <LanguageRounded />, tagline: 'Création et refonte de sites qui convertissent' },
+  seo: { from: '#5539d9', to: '#5539d9', icon: <TrendingUpRounded />, tagline: 'Être trouvé sur Google par les clients du coin' },
+  maintenance: { from: '#5539d9', to: '#5539d9', icon: <BuildCircleRounded />, tagline: 'Un site à jour, sauvegardé et sécurisé' },
 }
 const grad = (c: { from: string; to: string }, deg = 135) => `linear-gradient(${deg}deg, ${c.from}, ${c.to})`
 const gradText = (c: { from: string; to: string }) => ({ background: grad(c, 90), WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' })
 const features = (d: string) => d.split(/[,;\n·]+/).map((x) => x.trim().replace(/\.$/, '')).filter(Boolean)
-const HERO = { from: '#7c3aed', to: '#0891b2' }
+const HERO = { from: '#5539d9', to: '#5539d9' }
 
 export default function CataloguePage() {
   const store = useStore()
@@ -39,8 +39,7 @@ export default function CataloguePage() {
       {/* ---------- Bandeau ---------- */}
       <Box sx={{
         position: 'relative', overflow: 'hidden', borderRadius: '24px', mb: 3, p: { xs: 3, md: 4 }, color: '#fff',
-        background: `radial-gradient(circle at 85% 20%, ${alpha('#22d3ee', 0.55)}, transparent 45%), radial-gradient(circle at 10% 110%, ${alpha('#f472b6', 0.45)}, transparent 50%), ${grad(HERO)}`,
-        boxShadow: `0 24px 60px -28px ${alpha('#7c3aed', 0.9)}`,
+        bgcolor: '#5539d9',
         '&::after': { content: '""', position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none',
           backgroundImage: 'linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px)', backgroundSize: '32px 32px',
           maskImage: 'linear-gradient(110deg, transparent 35%, #000 100%)' },
@@ -54,7 +53,7 @@ export default function CataloguePage() {
             </Typography>
             {tab === 'catalogue' && store.isSuper && (
               <Button variant="contained" startIcon={<AddRounded />} onClick={() => setEdit({ id: uid(), name: '', category: filter === 'all' ? 'site' : filter, price: 0, billing: 'oneshot', description: '', active: true })}
-                sx={{ mt: 2.5, bgcolor: '#fff', color: '#5b21b6', backgroundImage: 'none', boxShadow: '0 10px 24px -10px rgba(0,0,0,.5)', '&:hover': { bgcolor: '#f3efff' } }}>
+                sx={{ mt: 2.5, bgcolor: '#fff', color: '#5539d9', backgroundImage: 'none', boxShadow: '0 10px 24px -10px rgba(0,0,0,.5)', '&:hover': { bgcolor: '#f3efff' } }}>
                 Nouveau pack
               </Button>
             )}

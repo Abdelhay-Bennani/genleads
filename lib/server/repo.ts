@@ -45,6 +45,7 @@ const toLead = (r: Row, interactions: Interaction[]): Prospect => ({
   assignee: (r.assignee as string) ?? null, status: r.status as Prospect['status'], nextFollowUp: (r.next_follow_up as string) ?? null,
   interactions, packIds: r.pack_ids as string[], discount: Number(r.discount ?? 0), source: r.source as string,
   templateId: (r.template_id as string) ?? null, templateIdUpdatedAt: iso(r.template_id_updated_at) ?? undefined,
+  address: r.address as string, department: r.department as string, trade: r.trade as string, callSession: r.call_session as string, socials: r.socials as string,
   createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!,
 })
 
@@ -146,6 +147,7 @@ export function cleanLead(b: Partial<Prospect> & Row): Prospect | null {
     })) : [],
     packIds: strList(b.packIds, 20, 40), discount: Math.max(0, Math.min(100, Number(b.discount) || 0)), source: str(b.source, 300),
     templateId: str(b.templateId, 40) || null, templateIdUpdatedAt: b.templateIdUpdatedAt ? String(b.templateIdUpdatedAt) : undefined,
+    address: str(b.address, 200), department: str(b.department, 4), trade: str(b.trade, 80), callSession: str(b.callSession, 60), socials: str(b.socials, 500),
     createdAt: iso(b.createdAt) ?? now, updatedAt: now,
   }
 }
@@ -155,15 +157,16 @@ export async function insertLead(sql: Sql, p: Prospect) {
   const tid = p.templateId ? (await sql`select id from website_templates where id = ${p.templateId}`)[0]?.id ?? null : null
   await sql`
     insert into leads (id, company, contact, phone, email, city, postal_code, sectors, activity, has_website, url, need, budget, assignee,
-      status, next_follow_up, pack_ids, discount, source, template_id, template_id_updated_at, created_at, updated_at)
+      status, next_follow_up, pack_ids, discount, source, template_id, template_id_updated_at, address, department, trade, call_session, socials, created_at, updated_at)
     values (${p.id}, ${p.company}, ${p.contact}, ${p.phone}, ${p.email}, ${p.city}, ${p.postalCode}, ${p.sectors}, ${p.activity}, ${p.hasWebsite},
       ${p.url}, ${p.need}, ${p.budget}, ${p.assignee}, ${p.status}, ${p.nextFollowUp}, ${p.packIds}, ${p.discount}, ${p.source}, ${tid},
-      ${p.templateIdUpdatedAt ?? null}, ${p.createdAt}, ${p.updatedAt})
+      ${p.templateIdUpdatedAt ?? null}, ${p.address ?? ''}, ${p.department ?? ''}, ${p.trade ?? ''}, ${p.callSession ?? ''}, ${p.socials ?? ''}, ${p.createdAt}, ${p.updatedAt})
     on conflict (id) do update set
       company = excluded.company, contact = excluded.contact, phone = excluded.phone, email = excluded.email, city = excluded.city,
       postal_code = excluded.postal_code, sectors = excluded.sectors, activity = excluded.activity, has_website = excluded.has_website,
       url = excluded.url, need = excluded.need, budget = excluded.budget, assignee = excluded.assignee, status = excluded.status,
       next_follow_up = excluded.next_follow_up, pack_ids = excluded.pack_ids, discount = excluded.discount, source = excluded.source,
+      address = excluded.address, department = excluded.department, trade = excluded.trade, call_session = excluded.call_session, socials = excluded.socials,
       template_id = case when coalesce(excluded.template_id_updated_at, '-infinity') >= coalesce(leads.template_id_updated_at, '-infinity')
         then excluded.template_id else leads.template_id end,
       template_id_updated_at = greatest(excluded.template_id_updated_at, leads.template_id_updated_at),

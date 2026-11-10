@@ -1,6 +1,6 @@
 import {
   AccountBalanceWalletOutlined, BadgeOutlined, DashboardOutlined, DesktopWindowsOutlined, DescriptionOutlined,
-  FolderOpenOutlined, InsightsOutlined, Inventory2Outlined, PeopleAltOutlined, ReceiptLongOutlined, SettingsOutlined,
+  FolderOpenOutlined, InsightsOutlined, Inventory2Outlined, PeopleAltOutlined, ReceiptLongOutlined, SettingsOutlined, TravelExploreOutlined,
 } from '@mui/icons-material'
 import type { SvgIconComponent } from '@mui/icons-material'
 
@@ -14,6 +14,7 @@ export const NAV: NavSection[] = [
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: DashboardOutlined },
       { href: '/leads', label: 'Leads CRM', icon: PeopleAltOutlined },
+      { href: '/prospects', label: 'Prospection', icon: TravelExploreOutlined },
       { href: '/clients', label: 'Clients', icon: BadgeOutlined },
     ],
   },

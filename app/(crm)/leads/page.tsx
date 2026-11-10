@@ -14,7 +14,7 @@ import { EmptyState, NeedChip, PageHeader, StatusChip, UserAvatar } from '@/comp
 import { useStore } from '@/lib/client/store'
 import { NEEDS, SECTORS, STATUSES } from '@/lib/shared/data'
 import type { Prospect, Status } from '@/lib/shared/types'
-import { dealValue, ensureHttp, eur, fmtDate, followState, normalize, telHref } from '@/lib/shared/utils'
+import { dealValue, ensureHttp, eur, fmtDate, followState, isSiteUnverified, normalize, SITE_UNVERIFIED, telHref } from '@/lib/shared/utils'
 
 const VIEW_KEY = 'agenceflow:leads-view'
 
@@ -56,7 +56,7 @@ export default function LeadsPage() {
     { field: 'company', headerName: 'Entreprise', flex: 1.4, minWidth: 170, renderCell: ({ row }) => (
       <Box sx={{ minWidth: 0, py: 1 }}>
         <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>{row.company}</Typography>
-        <Typography variant="caption" color={row.hasWebsite ? 'text.secondary' : 'warning.main'} noWrap component="p">{row.hasWebsite ? row.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') || 'Site : oui' : 'Sans site'}</Typography>
+        <Typography variant="caption" color={row.hasWebsite ? 'text.secondary' : 'warning.main'} noWrap component="p">{row.hasWebsite ? row.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') || 'Site : oui' : isSiteUnverified(row) ? SITE_UNVERIFIED : 'Sans site'}</Typography>
       </Box>
     ) },
     { field: 'city', headerName: 'Ville', flex: 0.7, minWidth: 100 },

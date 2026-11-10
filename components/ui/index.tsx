@@ -1,10 +1,12 @@
 'use client'
-import { Avatar, Box, Chip, Stack, Typography, type ChipProps, type SxProps } from '@mui/material'
+import { ArrowOutwardRounded } from '@mui/icons-material'
+import { Avatar, Box, Card, Chip, IconButton, Stack, Typography, type ChipProps, type SxProps } from '@mui/material'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { NEED_HEX, statusMeta } from '@/lib/shared/data'
 import type { Status } from '@/lib/shared/types'
 
-const AV = ['#1976d2', '#9c27b0', '#2e7d32', '#ed6c02', '#0288d1', '#d32f2f', '#5d4037']
+const AV = ['#5539d9', '#7e68e6', '#3f28b5', '#9a8bec', '#6a51e0']
 export const colorFor = (name: string) => AV[[...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % AV.length]
 
 export function UserAvatar({ name, size = 28 }: { name: string | null | undefined; size?: number }) {
@@ -21,7 +23,7 @@ export function StatusChip({ status, size = 'small' }: { status: Status; size?: 
   const m = statusMeta(status)
   return (
     <Chip size={size} label={m.label} variant="outlined"
-      sx={{ color: m.hex, borderColor: `${m.hex}66`, bgcolor: `${m.hex}14`, '& .MuiChip-label': { px: 1 } }}
+      sx={{ color: 'text.primary', borderColor: 'divider', bgcolor: 'background.paper', '& .MuiChip-label': { px: 1 } }}
       icon={<Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: m.hex, ml: '8px !important', mr: '-2px !important' }} />} />
   )
 }
@@ -67,4 +69,23 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 export function GlowBadge({ label, tone = 'violet' }: { label: string; tone?: 'violet' | 'green' | 'cyan' | 'gray' }) {
   const color = ({ violet: 'primary', green: 'success', cyan: 'info', gray: 'default' } as const)[tone]
   return <Chip size="small" label={label} color={color} variant="outlined" sx={{ height: 20, fontSize: '0.66rem' }} />
+}
+
+/** Tuile de chiffre clé (titre, flèche ronde, grand nombre). `filled` : version violette pleine. */
+export function StatTile({ label, value, sub, href, onClick, filled = false }: { label: string; value: ReactNode; sub?: ReactNode; href?: string; onClick?: () => void; filled?: boolean }) {
+  const link = href ? { component: Link, href } : onClick ? { onClick } : null
+  return (
+    <Card sx={[{ height: '100%', p: 2.5 }, filled && { bgcolor: 'primary.main', borderColor: 'primary.main', color: '#fff' }]}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 1, minHeight: 34 }}>
+        <Typography sx={{ fontWeight: 500 }}>{label}</Typography>
+        {link && (
+          <IconButton {...link} size="small" aria-label={label} sx={filled ? { bgcolor: '#fff', color: 'primary.main', '&:hover': { bgcolor: '#fff' } } : { border: 1, borderColor: 'text.primary', color: 'text.primary' }}>
+            <ArrowOutwardRounded fontSize="small" />
+          </IconButton>
+        )}
+      </Stack>
+      <Typography variant="h3" component="p" sx={{ mt: 1.5, mb: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>
+      {sub && <Typography variant="caption" sx={{ color: filled ? 'rgba(255,255,255,.85)' : 'primary.main' }}>{sub}</Typography>}
+    </Card>
+  )
 }

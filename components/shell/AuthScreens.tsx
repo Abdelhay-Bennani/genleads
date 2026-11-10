@@ -13,7 +13,7 @@ export function ModeToggle() {
   const resolved = mode === 'system' ? systemMode : mode
   return (
     <IconButton aria-label="Changer de thème" onClick={() => setMode(resolved === 'dark' ? 'light' : 'dark')} size="small"
-      sx={{ border: 1, borderColor: 'divider' }}>
+      sx={{ width: 44, height: 44, bgcolor: 'background.default' }}>
       {resolved === 'dark' ? <LightModeOutlined fontSize="small" /> : <DarkModeOutlined fontSize="small" />}
     </IconButton>
   )

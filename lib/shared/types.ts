@@ -51,6 +51,12 @@ export interface Prospect {
   source: string
   templateId?: string | null
   templateIdUpdatedAt?: string
+  /* Prospection (listes importées) */
+  address?: string
+  department?: string
+  trade?: string // métier précis : « Électricien », « Carreleur »…
+  callSession?: string // session de phoning prévue : « S1-A · Lun 09/11 »
+  socials?: string
   createdAt: string
   updatedAt: string
 }

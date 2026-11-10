@@ -35,6 +35,10 @@ export function quote(p: Prospect, packs: Pack[]) {
   return { sel, oneShotRaw, oneShot, mrr }
 }
 
+/** Session réservée aux entreprises dont l'absence de site n'a pas encore été contrôlée. */
+export const SITE_UNVERIFIED = 'Site à vérifier'
+export const isSiteUnverified = (p: Prospect) => !p.hasWebsite && p.callSession === SITE_UNVERIFIED
+
 /** Totaux d'un devis émis (lignes figées au moment de l'émission). */
 export function quoteTotals(q: Pick<Quote, 'lines' | 'discount' | 'vatRate'>) {
   const round = (n: number) => Math.round(n * 100) / 100
@@ -48,11 +52,11 @@ export function quoteTotals(q: Pick<Quote, 'lines' | 'discount' | 'vatRate'>) {
 }
 
 export const QUOTE_STATUS: Record<QuoteStatus, { label: string; hex: string }> = {
-  brouillon: { label: 'Brouillon', hex: '#757575' },
-  envoye: { label: 'Envoyé', hex: '#1976d2' },
-  accepte: { label: 'Accepté', hex: '#2e7d32' },
-  refuse: { label: 'Refusé', hex: '#d32f2f' },
-  annule: { label: 'Annulé', hex: '#9e9e9e' },
+  brouillon: { label: 'Brouillon', hex: '#6f6b85' },
+  envoye: { label: 'Envoyé', hex: '#5539d9' },
+  accepte: { label: 'Accepté', hex: '#3f28b5' },
+  refuse: { label: 'Refusé', hex: '#6f6b85' },
+  annule: { label: 'Annulé', hex: '#a8a5b8' },
 }
 
 /** Valeur one-shot d'une affaire : devis s'il existe, sinon budget estimé. */

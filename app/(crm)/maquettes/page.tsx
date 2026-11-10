@@ -204,7 +204,7 @@ function TemplateEditor({ template, onClose }: { template: WebsiteTemplate; onCl
             <Box onDragOver={(e) => { e.preventDefault(); setDrag(true) }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); addFiles(e.dataTransfer.files) }}
               sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: 1.25, p: 1.25, borderRadius: 3, border: '2px dashed', borderColor: drag ? 'primary.main' : 'divider', bgcolor: drag ? 'action.hover' : 'transparent' }}>
               {images.map((im, i) => (
-                <Card key={im.id} sx={{ borderColor: cover === im.id ? '#fbbf24' : undefined }}>
+                <Card key={im.id} sx={{ borderColor: cover === im.id ? '#5539d9' : undefined }}>
                   <Box sx={{ position: 'relative', aspectRatio: '4 / 3', bgcolor: 'action.hover' }}>
                     <Box component="img" src={imgUrl(im.thumb)} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                     <IconButton size="small" onClick={() => setT({ ...t, coverImageId: im.id })} sx={{ position: 'absolute', top: 4, left: 4, bgcolor: 'rgba(7,6,14,0.6)', color: cover === im.id ? '#fbbf24' : '#fff' }}>{cover === im.id ? <StarRounded fontSize="small" /> : <StarBorderRounded fontSize="small" />}</IconButton>

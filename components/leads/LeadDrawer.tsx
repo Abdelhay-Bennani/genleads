@@ -355,7 +355,7 @@ function MaquettesTab({ p, isNew, goDevis }: { p: Prospect; isNew: boolean; goDe
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
               <Box sx={{ width: 140, height: 88, borderRadius: 2, overflow: 'hidden', bgcolor: 'action.hover', flexShrink: 0 }}>{cover && <Box component="img" src={imgUrl(cover.thumb)} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />}</Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><StarRounded sx={{ color: '#fbbf24', fontSize: 18 }} /><Typography sx={{ fontWeight: 600 }}>{tpl.name}</Typography></Stack>
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><StarRounded sx={{ color: '#5539d9', fontSize: 18 }} /><Typography sx={{ fontWeight: 600 }}>{tpl.name}</Typography></Stack>
                 <Typography variant="caption" color="text.secondary">{store.categoryName(tpl.categoryId)} · {tpl.siteType}</Typography>
                 {tpl.demoUrl && <Box><Button size="small" href={tpl.demoUrl} target="_blank" startIcon={<OpenInNewRounded />} sx={{ px: 0 }}>Voir la démo</Button></Box>}
               </Box>

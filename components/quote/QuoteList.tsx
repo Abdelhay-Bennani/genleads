@@ -10,7 +10,7 @@ import { eur, fmtDate, QUOTE_STATUS, quoteTotals, todayISO } from '@/lib/shared/
 export const isExpired = (q: Quote) => q.status === 'envoye' && q.validUntil < todayISO()
 
 export function QuoteStatusChip({ q }: { q: Quote }) {
-  const m = isExpired(q) ? { label: 'Expiré', hex: '#ed6c02' } : QUOTE_STATUS[q.status]
+  const m = isExpired(q) ? { label: 'Expiré', hex: '#7e68e6' } : QUOTE_STATUS[q.status]
   return <Chip size="small" label={m.label} variant="outlined" sx={{ color: m.hex, borderColor: `${m.hex}66`, bgcolor: `${m.hex}14` }} />
 }
 

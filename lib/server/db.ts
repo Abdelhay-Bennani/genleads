@@ -117,6 +117,12 @@ create table if not exists leads (
   updated_at timestamptz not null default now()
 );
 
+alter table leads add column if not exists address text not null default '';
+alter table leads add column if not exists department text not null default '';
+alter table leads add column if not exists trade text not null default '';
+alter table leads add column if not exists call_session text not null default '';
+alter table leads add column if not exists socials text not null default '';
+
 create table if not exists lead_interactions (
   id text primary key,
   lead_id text not null references leads(id) on delete cascade,
@@ -192,7 +198,7 @@ create index if not exists quotes_lead on quotes(lead_id);
 `
 
 /** À incrémenter à chaque ajout dans SCHEMA : force la migration au démarrage suivant. */
-const SCHEMA_VERSION = '2'
+const SCHEMA_VERSION = '3'
 
 export async function seedCore(sql: Sql) {
   await sql`delete from packs`

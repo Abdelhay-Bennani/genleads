@@ -7,7 +7,7 @@ import { quoteTotals } from '@/lib/shared/utils'
  * Police Helvetica intégrée au PDF : pas de téléchargement de police, accents et « € » pris en charge.
  */
 
-const VIOLET = '#6d28d9'
+const VIOLET = '#5539d9'
 const INK = '#0f172a'
 const MUTED = '#64748b'
 const LINE = '#e2e8f0'

@@ -9,12 +9,12 @@ export function LogoMark({ size = 30 }: { size?: number }) {
   )
 }
 
-export function Logo({ size = 'md' }: { size?: 'md' | 'lg' }) {
+export function Logo({ size = 'md', name = 'AgenceFlow' }: { size?: 'md' | 'lg'; name?: string }) {
   return (
     <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
       <LogoMark size={size === 'lg' ? 38 : 30} />
       <Typography sx={{ fontWeight: 700, fontSize: size === 'lg' ? 22 : 17, letterSpacing: '-0.01em' }}>
-        AgenceFlow
+        {name}
       </Typography>
     </Stack>
   )

@@ -53,7 +53,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <Stack sx={{ height: '100%' }}>
-      <Box sx={{ px: 3, py: 3 }}><Logo /></Box>
+      <Box sx={{ px: 3, py: 3 }}><Logo name={store.settings.agencyName || 'AgenceFlow'} /></Box>
       <Box sx={{ flex: 1, overflowY: 'auto', px: 1.5 }}>
         {NAV.map((s) => ({ ...s, items: s.items.filter((i) => !i.module || store.can(i.module)) })).filter((s) => s.items.length).map((section, si) => (
           <Box key={si} sx={{ pb: 2 }}>

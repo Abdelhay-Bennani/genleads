@@ -57,7 +57,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           border: 'none',
-          '--DataGrid-containerBackground': alpha(theme.vars.palette.primary.mainChannel, 0.06),
+          '--DataGrid-containerBackground': brand.pale,
+          ...theme.applyStyles('dark', { '--DataGrid-containerBackground': alpha(brand.light, 0.14) }),
           '& .MuiDataGrid-cell': { display: 'flex', alignItems: 'center' },
           '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 600 },
           '& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within': { outline: 'none' },

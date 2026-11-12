@@ -1,6 +1,6 @@
 'use client'
 import { frFR as coreFrFR } from '@mui/material/locale'
-import { createTheme } from '@mui/material/styles'
+import { alpha, createTheme } from '@mui/material/styles'
 import { frFR as gridFrFR } from '@mui/x-data-grid/locales'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
@@ -55,12 +55,13 @@ export const theme = createTheme({
     MuiToggleButton: { styleOverrides: { root: { textTransform: 'none', fontWeight: 600 } } },
     MuiDataGrid: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           border: 'none',
-          '--DataGrid-containerBackground': 'transparent',
+          '--DataGrid-containerBackground': alpha(theme.vars.palette.primary.mainChannel, 0.06),
           '& .MuiDataGrid-cell': { display: 'flex', alignItems: 'center' },
           '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 600 },
-        },
+          '& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within': { outline: 'none' },
+        }),
       },
     },
   },

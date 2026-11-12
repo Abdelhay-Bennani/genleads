@@ -80,13 +80,6 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
           </Box>
         ))}
       </Box>
-      {store.can('prospects') && (
-        <Box sx={{ m: 1.5, p: 2, borderRadius: 4, bgcolor: 'primary.main', color: '#fff' }}>
-          <Typography sx={{ fontWeight: 600, lineHeight: 1.25 }}>{due ? `${due} appel${due > 1 ? 's' : ''} à faire` : 'Trouvez vos prochains clients'}</Typography>
-          <Typography variant="caption" sx={{ display: 'block', mt: 0.5, mb: 1.5, color: 'rgba(255,255,255,.85)' }}>Vos entreprises sans site web</Typography>
-          <Button fullWidth component={Link} href="/prospects" onClick={onNavigate} sx={{ bgcolor: '#fff', color: 'primary.main', '&:hover': { bgcolor: '#fff' } }}>Voir les prospects</Button>
-        </Box>
-      )}
     </Stack>
   )
 }

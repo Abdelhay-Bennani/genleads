@@ -65,6 +65,15 @@ export const theme = createTheme({
         }),
       },
     },
+    MuiTableHead: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: brand.pale,
+          ...theme.applyStyles('dark', { backgroundColor: alpha(brand.light, 0.14) }),
+          '& .MuiTableCell-root': { fontWeight: 600 },
+        }),
+      },
+    },
   },
 }, gridFrFR, coreFrFR) // tableaux et composants MUI en français (pagination, filtres…)
 

@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": "24.x"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",

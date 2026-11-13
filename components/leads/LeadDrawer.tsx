@@ -46,7 +46,7 @@ export function LeadDrawer({ id, draft: initialDraft, initialTab, onClose, onCre
   const create = () => { if (p.company.trim()) { store.saveProspect(p); onCreated(p.id) } }
 
   return (
-    <Drawer anchor="right" open onClose={onClose} slotProps={{ paper: { sx: { width: { xs: '100%', sm: 660 }, display: 'flex' } } }}>
+    <Drawer anchor="right" open onClose={onClose} slotProps={{ paper: { sx: { width: { xs: '100%', sm: 960 }, maxWidth: '100vw', display: 'flex' } } }}>
       {/* En-tête */}
       <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.25, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>

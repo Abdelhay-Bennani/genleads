@@ -27,7 +27,7 @@ export function ActivityLog() {
   const [more, setMore] = useState(false)
   const [busy, setBusy] = useState(false)
   const [user, setUser] = useState('')
-  const [role, setRole] = useState<'' | Role>('admin')
+  const [role, setRole] = useState<'' | Role>('')
   const [q, setQ] = useState('')
   const [debounced, setDebounced] = useState('')
 
@@ -51,23 +51,25 @@ export function ActivityLog() {
 
   return (
     <Card>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ p: 2, alignItems: { md: 'center' } }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6">Journal d'activité</Typography>
-          <Typography variant="body2" color="text.secondary">Toutes les actions faites dans le CRM : connexions, leads, devis, factures, paiements, maquettes, paramètres… Conservé 12 mois.</Typography>
-        </Box>
-        <TextField select size="small" label="Rôle" value={user ? '' : role} disabled={!!user} onChange={(e) => setRole(e.target.value as '' | Role)} sx={{ minWidth: 150 }}>
-          <MenuItem value="">Tous</MenuItem>
+      <Box sx={{ p: 2, pb: 1 }}>
+        <Typography variant="h6">Journal d'activité</Typography>
+        <Typography variant="body2" color="text.secondary">Toutes les actions faites dans le CRM : connexions, leads, devis, factures, paiements, maquettes, paramètres… Conservé 12 mois.</Typography>
+      </Box>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ px: 2, pb: 2, pt: 1, alignItems: { sm: 'center' } }}>
+        <TextField select size="small" label="Rôle" value={user ? '' : role} disabled={!!user} onChange={(e) => setRole(e.target.value as '' | Role)}
+          fullWidth={false} sx={{ width: { sm: 170 } }} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}>
+          <MenuItem value="">Tous les rôles</MenuItem>
           <MenuItem value="admin">Admins</MenuItem>
           <MenuItem value="super_admin">Super Admins</MenuItem>
         </TextField>
-        <TextField select size="small" label="Utilisateur" value={user} onChange={(e) => setUser(e.target.value)} sx={{ minWidth: 180 }}>
+        <TextField select size="small" label="Utilisateur" value={user} onChange={(e) => setUser(e.target.value)}
+          fullWidth={false} sx={{ width: { sm: 220 } }} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}>
           <MenuItem value="">Tous les utilisateurs</MenuItem>
           {store.users.map((u) => <MenuItem key={u.id} value={u.id}>{u.name}</MenuItem>)}
         </TextField>
-        <TextField size="small" placeholder="Rechercher…" value={q} onChange={(e) => setQ(e.target.value)}
+        <TextField size="small" placeholder="Rechercher une action, un lead, un devis…" value={q} onChange={(e) => setQ(e.target.value)} sx={{ flex: 1 }}
           slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRounded fontSize="small" /></InputAdornment> } }} />
-        <Tooltip title="Actualiser"><span><Button variant="outlined" onClick={() => load()} disabled={busy} sx={{ minWidth: 0, px: 1.25 }}><RefreshRounded /></Button></span></Tooltip>
+        <Tooltip title="Actualiser"><span><Button variant="outlined" onClick={() => load()} disabled={busy} sx={{ minWidth: 0, px: 1.25, height: 40 }}><RefreshRounded /></Button></span></Tooltip>
       </Stack>
       <TableContainer>
         <Table size="small">

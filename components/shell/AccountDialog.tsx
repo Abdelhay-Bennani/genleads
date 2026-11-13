@@ -17,7 +17,7 @@ export function AccountDialog({ onClose }: { onClose: () => void }) {
     catch (e) { setMsg({ ok: false, text: (e as Error).message }) }
   }
   return (
-    <Dialog open onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog open onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { maxWidth: 560 } } }}>
       <DialogTitle>Mon compte</DialogTitle>
       <DialogContent>
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mb: 3 }}>
@@ -34,7 +34,7 @@ export function AccountDialog({ onClose }: { onClose: () => void }) {
           {msg && <Alert severity={msg.ok ? 'success' : 'error'}>{msg.text}</Alert>}
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ px: 3, pb: 2.5, flexWrap: 'wrap', gap: 1, '& .MuiButton-root': { whiteSpace: 'nowrap' }, '& > :not(style) ~ :not(style)': { ml: 0 } }}>
         <Button color="inherit" onClick={auth.logout} sx={{ mr: 'auto' }}>Se déconnecter</Button>
         <Button onClick={onClose}>Fermer</Button>
         <Button variant="contained" disabled={!f.current || !f.next || !f.confirm} onClick={submit}>Changer le mot de passe</Button>

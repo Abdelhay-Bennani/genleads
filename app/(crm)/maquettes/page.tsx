@@ -23,12 +23,15 @@ import { fmtDate, fmtDateTime, normalize, uid } from '@/lib/shared/utils'
 
 type Sort = 'recent' | 'old' | 'name'
 const VIEW_KEY = 'agenceflow:maquettes-view'
+const COLS_KEY = 'agenceflow:maquettes-cols'
+type Cols = 3 | 4 | 5
 
 export default function MaquettesPage() {
   const store = useStore()
   const presenter = usePresenter()
   const drawer = useLeadDrawer()
   const [layout, setLayout] = useState<'grid' | 'list'>(() => { try { return (localStorage.getItem(VIEW_KEY) as 'grid' | 'list') || 'grid' } catch { return 'grid' } })
+  const [cols, setCols] = useState<Cols>(() => { try { const n = Number(localStorage.getItem(COLS_KEY)); return ([3, 4, 5].includes(n) ? n : 4) as Cols } catch { return 4 } })
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('')
   const [type, setType] = useState('')
@@ -53,6 +56,15 @@ export default function MaquettesPage() {
     return { id: uid(), name: '', categoryId: cat || store.templateCategories[0]?.id || null, siteType: 'Site vitrine', shortDescription: '', description: '', features: [], technologies: [], tags: [], demoUrl: '', demoUrlMobile: '', suggestedPackIds: [], status: 'active', coverImageId: null, site: null, createdAt: now, updatedAt: now }
   }
 
+  /** Boutons compacts pour les cartes de la grille (4 par ligne). */
+  const CardActions = ({ t }: { t: WebsiteTemplate }) => (
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
+      <Button size="small" variant="outlined" startIcon={<OpenInNewRounded />} href={safeHref(t.demoUrl) ?? '#'} target="_blank" disabled={!t.demoUrl} sx={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>Démo</Button>
+      <Button size="small" variant="contained" startIcon={<ShareOutlined />} disabled={t.status === 'archived'} onClick={() => presenter.share({ templateIds: [t.id] })} sx={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>Partager</Button>
+      <Tooltip title="Modifier"><IconButton size="small" onClick={() => setEditing(t)} sx={{ border: 1, borderColor: 'divider' }}><EditOutlined fontSize="small" /></IconButton></Tooltip>
+      <Tooltip title="Créer un devis à partir de cette maquette"><IconButton size="small" onClick={() => setQuoteFor(t)} sx={{ border: 1, borderColor: 'divider' }}><DescriptionOutlined fontSize="small" /></IconButton></Tooltip>
+    </Stack>
+  )
   const Actions = ({ t }: { t: WebsiteTemplate }) => (
     <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', rowGap: 0.75 }}>
       <Button size="small" variant="outlined" startIcon={<OpenInNewRounded />} href={safeHref(t.demoUrl) ?? '#'} target="_blank" disabled={!t.demoUrl}>Voir la démo</Button>
@@ -84,6 +96,14 @@ export default function MaquettesPage() {
             <TextField select value={status} onChange={(e) => setStatus(e.target.value as typeof status)}><MenuItem value="active">Actives</MenuItem><MenuItem value="archived">Archivées</MenuItem><MenuItem value="all">Toutes</MenuItem></TextField>
             <TextField select value={sort} onChange={(e) => setSort(e.target.value as Sort)}><MenuItem value="recent">Plus récentes</MenuItem><MenuItem value="old">Plus anciennes</MenuItem><MenuItem value="name">Nom (A→Z)</MenuItem></TextField>
           </Box>
+          {layout === 'grid' && (
+            <Tooltip title="Maquettes par ligne">
+              <ToggleButtonGroup size="small" exclusive value={cols} sx={{ display: { xs: 'none', lg: 'flex' } }}
+                onChange={(_e, v) => { if (v) { setCols(v); try { localStorage.setItem(COLS_KEY, String(v)) } catch { /* noop */ } } }}>
+                {[3, 4, 5].map((n) => <ToggleButton key={n} value={n} aria-label={`${n} par ligne`} sx={{ px: 1.5, fontWeight: 600 }}>{n}</ToggleButton>)}
+              </ToggleButtonGroup>
+            </Tooltip>
+          )}
           <ToggleButtonGroup size="small" exclusive value={layout} onChange={(_e, v) => { if (v) { setLayout(v); try { localStorage.setItem(VIEW_KEY, v) } catch { /* noop */ } } }}>
             <ToggleButton value="grid" aria-label="Grille"><GridViewRounded fontSize="small" /></ToggleButton>
             <ToggleButton value="list" aria-label="Liste"><ViewListRounded fontSize="small" /></ToggleButton>
@@ -96,27 +116,30 @@ export default function MaquettesPage() {
           {store.templates.length ? 'Modifiez les filtres.' : <Stack spacing={2} sx={{ alignItems: 'center' }}><span>Ajoutez votre première maquette avec ses captures d’écran.</span><Button variant="contained" startIcon={<AddRounded />} onClick={() => setEditing(blank())}>Nouvelle maquette</Button></Stack>}
         </EmptyState></Card>
       ) : layout === 'grid' ? (
-        <Grid container spacing={2.5}>
+        <Grid container spacing={cols === 5 ? 2 : 2.5} columns={{ xs: 1, sm: 2, md: 3, lg: cols }}>
           {list.map((t) => {
             const cover = store.coverOf(t)
             const chosen = store.templateClientSelections.filter((s) => s.templateId === t.id).length
             return (
-              <Grid key={t.id} size={{ xs: 12, sm: 6, xl: 4 }}>
+              <Grid key={t.id} size={1}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', opacity: t.status === 'archived' ? 0.6 : 1, transition: '0.2s', '&:hover': { borderColor: 'primary.main' } }}>
                   <CardActionArea onClick={() => setEditing(t)} sx={{ position: 'relative', aspectRatio: '16 / 10', bgcolor: 'action.hover', overflow: 'hidden' }}>
                     {cover ? <Box component="img" src={imgUrl(cover.thumb)} alt={t.name} loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                       : isHostedSite(t.demoUrl) ? <SitePreview url={t.demoUrl} title={t.name} />
                         : <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', color: 'text.disabled' }}><AddPhotoAlternateOutlined /></Box>}
-                    <Chip size="small" label={store.categoryName(t.categoryId)} sx={{ position: 'absolute', top: 10, left: 10, bgcolor: 'rgba(0,0,0,0.6)', color: '#fff' }} />
                     {t.status === 'archived' && <Chip size="small" label="Archivée" sx={{ position: 'absolute', top: 10, right: 10 }} />}
                     {t.site && t.status !== 'archived' && <Chip size="small" icon={<CodeRounded />} label="Site HTML" sx={{ position: 'absolute', top: 10, right: 10, bgcolor: 'rgba(0,0,0,0.6)', color: '#fff', '& .MuiChip-icon': { color: '#fff' } }} />}
                     {chosen > 0 && <Chip size="small" color="success" icon={<StarRounded />} label={`${chosen} choix client`} sx={{ position: 'absolute', bottom: 10, right: 10 }} />}
                   </CardActionArea>
-                  <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Typography sx={{ fontWeight: 600 }}>{t.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">{t.siteType} · ajoutée le {fmtDate(t.createdAt)}</Typography>
-                    {t.shortDescription && <Typography variant="body2" color="text.secondary" sx={{ mt: 1, flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.shortDescription}</Typography>}
-                    <Box sx={{ mt: 2 }}><Actions t={t} /></Box>
+                  <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2, '&:last-child': { pb: 2 } }}>
+                    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.75, minWidth: 0 }}>
+                      <Chip size="small" color="primary" variant="outlined" label={store.categoryName(t.categoryId)} sx={{ maxWidth: '60%' }} />
+                      <Typography variant="caption" color="text.secondary" noWrap>{t.siteType}</Typography>
+                    </Stack>
+                    <Typography sx={{ fontWeight: 600, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.name}</Typography>
+                    {t.shortDescription && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.shortDescription}</Typography>}
+                    <Typography variant="caption" color="text.disabled" sx={{ mt: 'auto', pt: 1 }}>Ajoutée le {fmtDate(t.createdAt)}</Typography>
+                    <Box sx={{ mt: 1.25 }}><CardActions t={t} /></Box>
                   </CardContent>
                 </Card>
               </Grid>

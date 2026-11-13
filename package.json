@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start -p 5173 -H 0.0.0.0",
     "setup": "node scripts/setup.mjs",
+    "import-demos": "node scripts/import-demos.mjs",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

@@ -2,7 +2,7 @@
 import {
   AddPhotoAlternateOutlined, AddRounded, BusinessRounded, CloseRounded, DownloadRounded, EditOutlined, KeyRounded, ManageAccountsOutlined,
   RestartAltRounded, ShieldOutlined, StorageRounded, UploadFileRounded, DeleteOutlineRounded, PeopleAltOutlined,
-  ContentCopyRounded, FiberManualRecord, VisibilityOffOutlined, VisibilityOutlined,
+  ContentCopyRounded, FiberManualRecord, VisibilityOffOutlined, VisibilityOutlined, HistoryRounded, BackupOutlined,
 } from '@mui/icons-material'
 import {
   Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid,
@@ -10,6 +10,8 @@ import {
 } from '@mui/material'
 import { useRef, useState } from 'react'
 import { AccountDialog } from '@/components/shell/AccountDialog'
+import { ActivityLog } from '@/components/shell/ActivityLog'
+import { BackupsPanel } from '@/components/shell/BackupsPanel'
 import { PasswordField } from '@/components/shell/AuthScreens'
 import { PermissionsPanel } from '@/components/shell/PermissionsPanel'
 import { AgencyMark } from '@/components/templates/Portfolio'
@@ -22,7 +24,7 @@ import type { AppData, Prospect, PublicUser, Role } from '@/lib/shared/types'
 import { ROLE_LABEL } from '@/lib/shared/types'
 import { csvToProspects, download, fmtDateTime, normalize, prospectsToCSV, todayISO } from '@/lib/shared/utils'
 
-type T = 'agence' | 'utilisateurs' | 'permissions' | 'donnees' | 'compte'
+type T = 'agence' | 'utilisateurs' | 'permissions' | 'journal' | 'donnees' | 'sauvegardes' | 'compte'
 
 export default function ParametresPage() {
   const store = useStore()
@@ -36,13 +38,17 @@ export default function ParametresPage() {
         {store.isSuper && <Tab value="agence" icon={<BusinessRounded fontSize="small" />} iconPosition="start" label="Agence" />}
         {store.isSuper && <Tab value="utilisateurs" icon={<PeopleAltOutlined fontSize="small" />} iconPosition="start" label="Utilisateurs" />}
         {store.isSuper && <Tab value="permissions" icon={<ShieldOutlined fontSize="small" />} iconPosition="start" label="Permissions" />}
+        {store.isSuper && <Tab value="journal" icon={<HistoryRounded fontSize="small" />} iconPosition="start" label="Journal" />}
         {showData && <Tab value="donnees" icon={<StorageRounded fontSize="small" />} iconPosition="start" label="Données" />}
+        {store.isSuper && <Tab value="sauvegardes" icon={<BackupOutlined fontSize="small" />} iconPosition="start" label="Sauvegardes" />}
         <Tab value="compte" icon={<ManageAccountsOutlined fontSize="small" />} iconPosition="start" label="Mon compte" />
       </Tabs>
       {tab === 'agence' && store.isSuper && <Agency />}
       {tab === 'utilisateurs' && store.isSuper && <Users />}
       {tab === 'permissions' && store.isSuper && <PermissionsPanel />}
+      {tab === 'journal' && store.isSuper && <ActivityLog />}
       {tab === 'donnees' && showData && <Data />}
+      {tab === 'sauvegardes' && store.isSuper && <BackupsPanel />}
       {account && <AccountDialog onClose={() => setAccount(false)} />}
     </>
   )

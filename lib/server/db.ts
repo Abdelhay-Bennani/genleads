@@ -252,10 +252,37 @@ create table if not exists payments (
   created_at timestamptz not null default now()
 );
 create index if not exists payments_invoice on payments(invoice_id);
+
+create table if not exists activity_log (
+  id bigserial primary key,
+  at timestamptz not null default now(),
+  user_id text,
+  user_name text not null,
+  role text not null default '',
+  action text not null,
+  target text not null default '',
+  details text not null default '',
+  ip text not null default '',
+  count int not null default 1
+);
+create index if not exists activity_log_at on activity_log(at desc);
+create index if not exists activity_log_user on activity_log(user_id, at desc);
+
+create table if not exists backups (
+  id text primary key,
+  created_at timestamptz not null default now(),
+  kind text not null,
+  label text not null default '',
+  created_by text,
+  size int not null default 0,
+  counts jsonb not null default '{}',
+  data jsonb not null
+);
+create index if not exists backups_created on backups(created_at desc);
 `
 
 /** À incrémenter à chaque ajout dans SCHEMA : force la migration au démarrage suivant. */
-const SCHEMA_VERSION = '5'
+const SCHEMA_VERSION = '6'
 
 export async function seedCore(sql: Sql) {
   await sql`delete from packs`

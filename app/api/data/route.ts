@@ -1,3 +1,5 @@
+import { after } from 'next/server'
+import { maybeAutoBackup } from '@/lib/server/backup'
 import { db } from '@/lib/server/db'
 import { bad, body, requireSuper, requireUser, route } from '@/lib/server/http'
 import { cleanLead, insertLead, loadAll, replaceKeywords, replacePacks, scopeData } from '@/lib/server/repo'
@@ -7,6 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const GET = route(async () => {
   const me = await requireUser()
+  after(() => maybeAutoBackup().catch((e) => console.error('sauvegarde auto :', e)))
   return scopeData(await loadAll(await db()), me)
 })
 

@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { hasModule, type ModuleId } from '../shared/modules'
 import type { PublicUser } from '../shared/types'
+import { activityAfter, activityBefore, setActor, withLogContext } from './activity'
 import { ConfigError, db, run } from './db'
 import { toUser } from './repo'
 
@@ -16,11 +17,15 @@ export class HttpError extends Error {
 }
 export const bad = (msg: string, status = 400) => new HttpError(status, msg)
 
-/** Enveloppe commune des routes API : erreurs → JSON en français. */
+/** Enveloppe commune des routes API : erreurs → JSON en français, journal d'activité des modifications. */
 export function route<A extends unknown[]>(fn: (...args: A) => Promise<Response | unknown>) {
-  return async (...args: A): Promise<Response> => {
+  return (...args: A): Promise<Response> => withLogContext(async () => {
+    const req = args[0] instanceof Request ? args[0] : null
+    const track = !!req && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)
     try {
+      const before = track ? await activityBefore(req!) : null
       const r = await fn(...args)
+      if (track) await activityAfter(req!, before, r instanceof Response ? null : r, clientIp(req!))
       return r instanceof Response ? r : NextResponse.json(r ?? { ok: true })
     } catch (e) {
       if (e instanceof HttpError) return NextResponse.json({ error: e.message }, { status: e.status })
@@ -31,7 +36,7 @@ export function route<A extends unknown[]>(fn: (...args: A) => Promise<Response 
         return NextResponse.json({ error: 'Base de données injoignable : vérifiez DATABASE_URL et votre connexion Internet.' }, { status: 503 })
       return NextResponse.json({ error: 'Erreur interne du serveur.' }, { status: 500 })
     }
-  }
+  })
 }
 
 export async function body<T = Record<string, unknown>>(req: Request): Promise<T> {
@@ -42,6 +47,8 @@ const hashToken = (t: string) => crypto.createHash('sha256').update(t).digest('h
 
 export async function startSession(userId: string) {
   const sql = await db()
+  const [who] = await sql`select id, name, role from users where id = ${userId}`
+  if (who) setActor(who as { id: string; name: string; role: string })
   const token = crypto.randomBytes(32).toString('hex')
   await sql`delete from sessions where expires_at < now()`
   await sql`insert into sessions (hash, user_id, expires_at) values (${hashToken(token)}, ${userId}, now() + ${SESSION_DAYS + ' days'}::interval)`
@@ -62,7 +69,11 @@ export async function currentSessionHash() {
 export async function endSession() {
   const jar = await cookies()
   const token = jar.get(COOKIE)?.value
-  if (token) await run`delete from sessions where hash = ${hashToken(token)}`
+  if (token) {
+    const [u] = await run`select u.id, u.name, u.role from sessions s join users u on u.id = s.user_id where s.hash = ${hashToken(token)}`
+    if (u) setActor(u as { id: string; name: string; role: string })
+    await run`delete from sessions where hash = ${hashToken(token)}`
+  }
   jar.delete(COOKIE)
 }
 
@@ -78,7 +89,9 @@ export async function currentUser(): Promise<SessionUser | null> {
   // Présence : activité notée au plus une fois par minute (l'appli se synchronise toutes les 20 s)
   const seen = r.last_seen_at ? new Date(r.last_seen_at as string).getTime() : 0
   if (Date.now() - seen > 60e3) await sql`update users set last_seen_at = now() where id = ${r.id as string}`
-  return { ...toUser(r), passwordHash: r.password_hash as string }
+  const user = toUser(r)
+  setActor(user)
+  return { ...user, passwordHash: r.password_hash as string }
 }
 
 export async function requireUser() {

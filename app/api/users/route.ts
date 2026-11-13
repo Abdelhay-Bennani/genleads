@@ -1,3 +1,4 @@
+import { sealPassword } from '@/lib/server/secret'
 import { db } from '@/lib/server/db'
 import { bad, body, checkPassword, checkUsername, hashPassword, requireSuper, route } from '@/lib/server/http'
 import { toUser, uid } from '@/lib/server/repo'
@@ -14,6 +15,6 @@ export const POST = route(async (req: Request) => {
   if (dup) throw bad('Un utilisateur porte déjà ce nom.')
   await checkUsername(username)
   checkPassword(password)
-  const [u] = await sql`insert into users (id, name, username, role, password_hash, disabled_modules) values (${uid()}, ${n}, ${username.trim()}, ${role}, ${await hashPassword(password)}, ${role === 'admin' ? cleanModules(disabledModules) : []}) returning *`
+  const [u] = await sql`insert into users (id, name, username, role, password_hash, password_enc, disabled_modules) values (${uid()}, ${n}, ${username.trim()}, ${role}, ${await hashPassword(password)}, ${sealPassword(password)}, ${role === 'admin' ? cleanModules(disabledModules) : []}) returning *`
   return toUser(u)
 })

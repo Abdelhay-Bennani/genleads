@@ -197,6 +197,8 @@ create table if not exists quotes (
 create index if not exists quotes_lead on quotes(lead_id);
 
 alter table users add column if not exists disabled_modules text[] not null default '{}';
+alter table users add column if not exists password_enc text;
+alter table users add column if not exists last_seen_at timestamptz;
 alter table website_templates add column if not exists site_version text;
 
 create table if not exists template_site_files (
@@ -253,7 +255,7 @@ create index if not exists payments_invoice on payments(invoice_id);
 `
 
 /** À incrémenter à chaque ajout dans SCHEMA : force la migration au démarrage suivant. */
-const SCHEMA_VERSION = '4'
+const SCHEMA_VERSION = '5'
 
 export async function seedCore(sql: Sql) {
   await sql`delete from packs`

@@ -45,7 +45,7 @@ export async function startSession(userId: string) {
   const token = crypto.randomBytes(32).toString('hex')
   await sql`delete from sessions where expires_at < now()`
   await sql`insert into sessions (hash, user_id, expires_at) values (${hashToken(token)}, ${userId}, now() + ${SESSION_DAYS + ' days'}::interval)`
-  await sql`update users set last_login_at = now() where id = ${userId}`
+  await sql`update users set last_login_at = now(), last_seen_at = now() where id = ${userId}`
   const jar = await cookies()
   jar.set(COOKIE, token, {
     httpOnly: true, sameSite: 'lax', path: '/', maxAge: SESSION_DAYS * 86400,
@@ -74,7 +74,11 @@ export async function currentUser(): Promise<SessionUser | null> {
   const sql = await db()
   const [r] = await sql`select u.* from sessions s join users u on u.id = s.user_id
     where s.hash = ${hashToken(token)} and s.expires_at > now() and u.active`
-  return r ? { ...toUser(r), passwordHash: r.password_hash as string } : null
+  if (!r) return null
+  // Présence : activité notée au plus une fois par minute (l'appli se synchronise toutes les 20 s)
+  const seen = r.last_seen_at ? new Date(r.last_seen_at as string).getTime() : 0
+  if (Date.now() - seen > 60e3) await sql`update users set last_seen_at = now() where id = ${r.id as string}`
+  return { ...toUser(r), passwordHash: r.password_hash as string }
 }
 
 export async function requireUser() {

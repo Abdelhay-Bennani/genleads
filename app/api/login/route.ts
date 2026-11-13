@@ -1,3 +1,4 @@
+import { openPassword, sealPassword } from '@/lib/server/secret'
 import { db } from '@/lib/server/db'
 import { bad, body, checkPasswordHash, clientIp, rateLimit, route, startSession } from '@/lib/server/http'
 import { toUser } from '@/lib/server/repo'
@@ -24,6 +25,8 @@ export const POST = route(async (req: Request) => {
     throw bad('Identifiant ou mot de passe incorrect, ou compte désactivé.', 401)
   }
   fails.delete(key)
+  // Comptes antérieurs : la copie chiffrée est créée à la prochaine connexion
+  if (openPassword(u.password_enc) !== String(password)) await sql`update users set password_enc = ${sealPassword(String(password))} where id = ${u.id as string}`
   await startSession(u.id as string)
   return { user: toUser(u) }
 })

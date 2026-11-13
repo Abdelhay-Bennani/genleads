@@ -16,6 +16,11 @@ export interface PublicUser {
   lastLoginAt: string | null
   /** Modules retirés à cet Admin par le Super Admin (sans effet sur un Super Admin). */
   disabledModules: ModuleId[]
+  /** Connecté et actif dans les 2 dernières minutes. */
+  online?: boolean
+  lastSeenAt?: string | null
+  /** Mot de passe en clair : transmis uniquement au Super Admin (null si encore inconnu). */
+  password?: string | null
 }
 
 export type Status = 'a_qualifier' | 'a_contacter' | 'r1' | 'devis' | 'gagne' | 'perdu'

@@ -2,10 +2,11 @@
 import {
   AddPhotoAlternateOutlined, AddRounded, BusinessRounded, CloseRounded, DownloadRounded, EditOutlined, KeyRounded, ManageAccountsOutlined,
   RestartAltRounded, ShieldOutlined, StorageRounded, UploadFileRounded, DeleteOutlineRounded, PeopleAltOutlined,
+  ContentCopyRounded, FiberManualRecord, VisibilityOffOutlined, VisibilityOutlined,
 } from '@mui/icons-material'
 import {
   Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid,
-  IconButton, List, ListItem, ListItemText, Stack, Switch, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography,
+  IconButton, List, ListItem, ListItemText, Stack, Switch, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography,
 } from '@mui/material'
 import { useRef, useState } from 'react'
 import { AccountDialog } from '@/components/shell/AccountDialog'
@@ -138,8 +139,12 @@ function Users() {
               <ListItem sx={{ py: 1.5, opacity: u.active ? 1 : 0.6, flexWrap: 'wrap', gap: 1.5 }}>
                 <UserAvatar name={u.name} size={38} />
                 <ListItemText sx={{ minWidth: 200 }}
-                  primary={<Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}><b>{u.name}</b>{u.id === store.me.id && <Typography variant="caption" color="text.secondary">(vous)</Typography>}<Chip size="small" label={ROLE_LABEL[u.role]} color={u.role === 'super_admin' ? 'primary' : 'default'} variant="outlined" />{!u.active && <Chip size="small" color="error" variant="outlined" label="Désactivé" />}</Stack>}
-                  secondary={`@${u.username} · ${assigned(u.name)} lead(s) · ${u.lastLoginAt ? `dernière connexion ${fmtDateTime(u.lastLoginAt)}` : 'jamais connecté'}`} />
+                  primary={<Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}><b>{u.name}</b>{u.id === store.me.id && <Typography variant="caption" color="text.secondary">(vous)</Typography>}<Chip size="small" label={ROLE_LABEL[u.role]} color={u.role === 'super_admin' ? 'primary' : 'default'} variant="outlined" />{!u.active && <Chip size="small" color="error" variant="outlined" label="Désactivé" />}{u.active && <OnlineChip user={u} />}</Stack>}
+                  secondary={<>
+                    {`@${u.username} · ${assigned(u.name)} lead(s) · ${u.lastLoginAt ? `dernière connexion ${fmtDateTime(u.lastLoginAt)}` : 'jamais connecté'}`}
+                    <PasswordReveal password={u.password} />
+                  </>}
+                  slotProps={{ secondary: { component: 'div' } }} />
                 <Stack direction="row" spacing={1}>
                   <Button size="small" variant="outlined" startIcon={<EditOutlined />} onClick={() => setEditing({ mode: 'edit', user: u })}>Modifier</Button>
                   <Button size="small" variant="outlined" startIcon={<KeyRounded />} onClick={() => setEditing({ mode: 'password', user: u })}>Mot de passe</Button>
@@ -153,6 +158,32 @@ function Users() {
       {editing && (editing.mode === 'new' || editing.mode === 'edit') && <UserForm user={editing.user} onClose={() => setEditing(null)} />}
       {editing?.mode === 'password' && editing.user && <ResetPassword user={editing.user} onClose={() => setEditing(null)} />}
       {editing?.mode === 'delete' && editing.user && <DeleteUser user={editing.user} onClose={() => setEditing(null)} />}
+    </Stack>
+  )
+}
+
+function OnlineChip({ user }: { user: PublicUser }) {
+  const title = user.online ? 'Actif dans les 2 dernières minutes' : user.lastSeenAt ? `Vu pour la dernière fois ${fmtDateTime(user.lastSeenAt)}` : 'Jamais vu en ligne'
+  return (
+    <Tooltip title={title}>
+      <Chip size="small" variant="outlined" color={user.online ? 'success' : 'default'} label={user.online ? 'En ligne' : 'Hors ligne'}
+        icon={<FiberManualRecord sx={{ fontSize: '10px !important', color: user.online ? 'success.main' : 'text.disabled' }} />} />
+    </Tooltip>
+  )
+}
+
+/** Mot de passe visible par le Super Admin (masqué par défaut). */
+function PasswordReveal({ password }: { password?: string | null }) {
+  const store = useStore()
+  const [show, setShow] = useState(false)
+  if (password === undefined) return null
+  if (password === null) return <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.25 }}>Mot de passe : inconnu (visible après sa prochaine connexion ou une réinitialisation)</Typography>
+  return (
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 0.25 }}>
+      <Typography variant="caption" color="text.secondary">Mot de passe :</Typography>
+      <Typography variant="caption" sx={{ fontFamily: 'monospace', userSelect: show ? 'text' : 'none' }}>{show ? password : '••••••••'}</Typography>
+      <Tooltip title={show ? 'Masquer' : 'Afficher'}><IconButton size="small" onClick={() => setShow(!show)}>{show ? <VisibilityOffOutlined sx={{ fontSize: 16 }} /> : <VisibilityOutlined sx={{ fontSize: 16 }} />}</IconButton></Tooltip>
+      {show && <Tooltip title="Copier"><IconButton size="small" onClick={() => { navigator.clipboard?.writeText(password); store.notify('Mot de passe copié') }}><ContentCopyRounded sx={{ fontSize: 16 }} /></IconButton></Tooltip>}
     </Stack>
   )
 }

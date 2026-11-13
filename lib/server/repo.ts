@@ -7,6 +7,7 @@ import type {
   AgencySettings, ClientSelection, Interaction, Invoice, KeywordQuery, Pack, Payment, Presentation, PresentationItem, Prospect, PublicUser, Quote,
   TemplateCategory, TemplateImage, WebsiteTemplate,
 } from '../shared/types'
+import { openPassword } from './secret'
 import { DEFAULT_SETTINGS } from './seed'
 
 type Sql = ReturnType<typeof postgres>
@@ -115,7 +116,9 @@ export async function loadAll(sql: Sql) {
     loadLeads(sql),
     sql`select * from packs order by position, name`,
     sql`select * from prospecting_queries order by position`,
-    sql`select * from users order by created_at`,
+    sql`select u.*, (u.last_seen_at > now() - interval '2 minutes'
+      and exists (select 1 from sessions s where s.user_id = u.id and s.expires_at > now())) as online
+      from users u order by u.created_at`,
     sql`select * from template_categories order by position, name`,
     sql`select * from website_templates order by created_at desc`,
     sql`select * from template_images order by template_id, position`,
@@ -134,7 +137,7 @@ export async function loadAll(sql: Sql) {
     prospects,
     packs: packs.map((r): Pack => ({ id: r.id, name: r.name, category: r.category, price: Number(r.price), billing: r.billing, description: r.description, active: r.active })),
     keywords: keywords.map((r): KeywordQuery => ({ id: r.id, category: r.category, label: r.label, query: r.query })),
-    users: users.map(toUser),
+    users: users.map((r) => ({ ...toUser(r), online: !!r.online, lastSeenAt: iso(r.last_seen_at), password: openPassword(r.password_enc) })),
     templateCategories: cats.map((r): TemplateCategory => ({ id: r.id, name: r.name, builtin: r.builtin })),
     templates: templates.map((r) => toTemplate(r, siteOf.get(r.id as string) ?? null)),
     templateImages: images.map(toImage),
@@ -169,7 +172,7 @@ export function scopeData(d: Awaited<ReturnType<typeof loadAll>>, u: PublicUser)
     keywords: can('leads', 'prospects') ? d.keywords : [],
     templateCategories: tpl ? d.templateCategories : [], templates: tpl ? d.templates : [], templateImages: tpl ? d.templateImages : [],
     templatePresentations: presentations, templatePresentationItems: tpl ? d.templatePresentationItems : [], templateClientSelections: tpl ? d.templateClientSelections : [],
-    users: d.users.map((x) => (x.id === u.id ? x : { ...x, disabledModules: [] })),
+    users: d.users.map((x) => ({ ...x, password: undefined, ...(x.id === u.id ? {} : { disabledModules: [] }) })),
   }
 }
 

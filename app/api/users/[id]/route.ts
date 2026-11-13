@@ -1,3 +1,4 @@
+import { sealPassword } from '@/lib/server/secret'
 import { db } from '@/lib/server/db'
 import { bad, body, checkPassword, checkUsername, hashPassword, requireSuper, route } from '@/lib/server/http'
 import { toUser } from '@/lib/server/repo'
@@ -46,7 +47,7 @@ export const PATCH = route(async (req: Request, { params }: Ctx) => {
       if (!b.active) await tx`delete from sessions where user_id = ${id}`
     }
     if (b.password) {
-      await tx`update users set password_hash = ${await hashPassword(b.password)} where id = ${id}`
+      await tx`update users set password_hash = ${await hashPassword(b.password)}, password_enc = ${sealPassword(b.password)} where id = ${id}`
       if (id !== me.id) await tx`delete from sessions where user_id = ${id}`
     }
   })
